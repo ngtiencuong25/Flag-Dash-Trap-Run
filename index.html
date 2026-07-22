@@ -74,10 +74,16 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 
 /* ================= MENU UI ================= */
 #menuScreen{
-  position:fixed; inset:0; z-index:300; display:flex; flex-direction:column;
+  position:fixed; inset:0; z-index:300; display:none; flex-direction:column;
   background:radial-gradient(ellipse at 50% 0%,#1a1426 0%,#08060c 60%);
   color:var(--text); font-family:'Courier New',monospace; overflow-y:auto;
 }
+#menuBackBtn{
+  display:flex; align-items:center; gap:6px; background:none; border:1px solid var(--border); color:var(--text-dim);
+  font-family:inherit; font-size:12px; letter-spacing:1px; padding:8px 14px; cursor:pointer; border-radius:6px;
+  margin-bottom:16px; transition:.2s; align-self:flex-start;
+}
+#menuBackBtn:hover{ border-color:var(--accent); color:#ff8888; }
 #menuInner{ max-width:780px; margin:0 auto; width:100%; padding:24px 16px 60px; }
 #menuHead{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:20px; }
 #menuHead h1{ font-size:clamp(28px,6vw,42px); letter-spacing:4px; color:#fff; text-shadow:0 0 18px rgba(255,68,68,.5); }
@@ -87,6 +93,39 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
   background:rgba(255,215,0,.08); border:1px solid rgba(255,215,0,.4); color:var(--gold);
   padding:8px 14px; font-size:14px; white-space:nowrap; letter-spacing:1px; border-radius:6px;
 }
+#modeGrid, #funModeGrid{ display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:6px; }
+.modeCard{
+  width:220px; background:var(--card); border:1px solid var(--border); border-radius:12px;
+  padding:30px 16px; display:flex; flex-direction:column; align-items:center; gap:10px;
+  color:#ddd; font-family:inherit; cursor:pointer; transition:.2s;
+}
+.modeCard:hover{ border-color:var(--accent); color:#ff9999; transform:translateY(-3px); box-shadow:0 0 20px rgba(255,68,68,.15); }
+.modeCard .modeIcon{ font-size:36px; }
+.modeCard .modeName{ font-size:15px; font-weight:bold; letter-spacing:1px; color:#fff; }
+.modeCard .modeDesc{ font-size:11px; color:var(--text-dim); text-align:center; line-height:1.4; }
+.modeCard.soon{ opacity:.85; }
+.modeCard .modeTag{ font-size:9px; letter-spacing:1px; color:var(--gold); background:rgba(255,215,0,.1); border:1px solid rgba(255,215,0,.35); padding:2px 8px; border-radius:10px; margin-top:2px; }
+@media(max-width:480px){ .modeCard{ width:150px; padding:22px 10px; } }
+#modeBackLink{
+  display:inline-block; background:none; border:none; color:var(--text-dim); font-family:inherit;
+  font-size:12px; letter-spacing:1px; cursor:pointer; padding:0; margin-bottom:16px; transition:.2s;
+}
+#modeBackLink:hover{ color:#ff8888; }
+.modeComingSoon{ text-align:center; padding:60px 20px; color:var(--text-dim); }
+.modeComingSoon .icon{ font-size:40px; margin-bottom:14px; }
+.modeComingSoon .txt{ font-size:14px; letter-spacing:1px; }
+.modeComingSoon .sub{ font-size:12px; margin-top:8px; color:#555; }
+.modeSubBack{
+  display:inline-block; background:none; border:none; color:var(--text-dim); font-family:inherit;
+  font-size:12px; letter-spacing:1px; cursor:pointer; padding:0; margin-bottom:16px; transition:.2s;
+}
+.modeSubBack:hover{ color:#ff8888; }
+#speedGrid{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.speedBtn{
+  width:82px; height:82px; border-radius:12px; background:var(--card); border:1px solid var(--border);
+  color:#fff; font-family:inherit; font-weight:bold; font-size:17px; letter-spacing:1px; cursor:pointer; transition:.2s;
+}
+.speedBtn:hover{ border-color:var(--accent); color:#ff8888; transform:translateY(-3px); box-shadow:0 0 16px rgba(255,68,68,.15); }
 #tabs{ display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; }
 .tabBtn{
   background:var(--card); border:1px solid var(--border); color:var(--text-dim); font-family:inherit;
@@ -189,6 +228,68 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 #devTool button.active { background:#0f0; color:#000; }
 #devTool .close-btn { background:#500; border-color:#f00; color:#f00; margin-top:15px; text-align:center; font-weight:bold; }
 #devTool .close-btn:hover { background:#f00; color:#000; }
+
+/* ================= HOME SCREEN ================= */
+#homeScreen{
+  position:fixed; inset:0; z-index:305; display:flex; flex-direction:column;
+  background:radial-gradient(ellipse at 50% 0%,#1a1426 0%,#08060c 60%);
+  color:var(--text); font-family:'Courier New',monospace; overflow:hidden;
+}
+#homeTopBar{ display:flex; justify-content:space-between; align-items:flex-start; padding:20px 24px; z-index:2; }
+#gearBtn{
+  width:48px; height:48px; background:rgba(255,68,68,.08); border:1px solid rgba(255,68,68,.55);
+  color:#ff8888; font-size:20px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:.2s; font-family:inherit;
+}
+#gearBtn:hover{ background:rgba(255,68,68,.28); transform:rotate(35deg); }
+#goldBadgeHome{
+  background:rgba(255,215,0,.08); border:1px solid rgba(255,215,0,.4); color:var(--gold);
+  padding:0 16px; font-size:15px; white-space:nowrap; letter-spacing:1px; border-radius:10px;
+  display:flex; align-items:center; gap:8px; height:48px;
+}
+#homeCenter{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 16px 40px; text-align:center; z-index:2; }
+#homeTitle{ font-size:clamp(34px,8vw,58px); letter-spacing:6px; color:#fff; text-shadow:0 0 20px rgba(255,68,68,.5); display:flex; align-items:center; gap:16px; font-weight:bold; }
+#homeTitle .co{ color:var(--accent); }
+#homeTitle .flagIcon{ color:var(--accent); font-size:0.55em; line-height:1; border-left:2px solid #444; padding-left:16px; margin-left:2px; }
+#homeTagline{ color:var(--text-dim); font-size:13px; letter-spacing:1px; margin:16px 0 32px; display:flex; align-items:center; gap:12px; }
+#homeTagline::before, #homeTagline::after{ content:''; width:36px; height:1px; background:var(--border); }
+#playNowBtn{
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  background:transparent; border:1px solid var(--accent); color:#fff; font-family:inherit;
+  font-weight:bold; letter-spacing:3px; padding:18px 56px; font-size:17px; cursor:pointer;
+  text-transform:uppercase; border-radius:8px; transition:.2s; margin-bottom:34px;
+}
+#playNowBtn:hover{ background:rgba(255,68,68,.14); transform:translateY(-2px); box-shadow:0 0 20px rgba(255,68,68,.2); }
+#playNowBtn .tri{ color:var(--accent); }
+#homeMenuGrid{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+.homeCard{
+  width:150px; background:var(--card); border:1px solid var(--border); border-radius:10px;
+  padding:22px 10px; display:flex; flex-direction:column; align-items:center; gap:12px;
+  color:#ddd; font-family:inherit; font-size:11px; letter-spacing:1px; cursor:pointer; transition:.2s;
+}
+.homeCard:hover{ border-color:var(--accent); color:#ff8888; transform:translateY(-3px); }
+.homeCard .icon{ font-size:26px; }
+#homeGroundWrap{ position:relative; height:70px; z-index:1; }
+#homeGround{ position:absolute; left:0; right:0; top:0; height:5px; background:#241f2e; border-top:1px solid #33283a; }
+#homeGround::after{
+  content:''; position:absolute; inset:0; top:5px; height:65px;
+  background-image:radial-gradient(circle at 10% 0, transparent 8px, #08060c 8px);
+  background-size:70px 20px; background-repeat:repeat-x; opacity:.6;
+}
+#homePlayer{
+  position:absolute; left:60px; bottom:5px; width:32px; height:52px; border-radius:4px;
+  box-shadow:0 0 14px rgba(0,0,0,.6), inset 0 0 8px rgba(255,255,255,.15);
+}
+#homePlayer::before, #homePlayer::after{ content:''; position:absolute; width:5px; height:5px; background:#111; top:15px; }
+#homePlayer::before{ left:7px; } #homePlayer::after{ right:7px; }
+#homeVersion{ text-align:center; color:#555; font-size:11px; letter-spacing:1px; padding:16px; display:flex; align-items:center; justify-content:center; gap:12px; z-index:2; }
+#homeVersion::before, #homeVersion::after{ content:''; width:56px; height:1px; background:#2a2233; }
+@media(max-width:480px){
+  .homeCard{ width:98px; font-size:9.5px; padding:16px 6px; }
+  .homeCard .icon{ font-size:22px; }
+  #playNowBtn{ padding:15px 38px; font-size:14px; }
+}
+#infoModal{ z-index:320; }
 </style>
 </head>
 <body>
@@ -196,6 +297,7 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 <!-- ================= MENU ================= -->
 <div id="menuScreen">
   <div id="menuInner">
+    <button id="menuBackBtn" onclick="goHome()">← Trang chủ</button>
     <div id="menuHead">
       <h1>TÌM <span>CỜ 🚩</span></h1>
       <div id="goldBadge">💰 <span id="goldVal">0</span></div>
@@ -212,11 +314,62 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
       <button class="tabBtn" data-tab="settings">⚙ Cài Đặt</button>
     </div>
 
-    <div id="playTab" class="tab-content show">
+    <div id="modeSelectTab" class="tab-content">
+      <div id="modeGrid">
+        <button class="modeCard" id="modeNormalBtn">
+          <span class="modeIcon">🎯</span>
+          <span class="modeName">THÔNG THƯỜNG</span>
+          <span class="modeDesc">Vượt qua từng màn, tìm cờ đích ẩn trên bản đồ</span>
+        </button>
+        <button class="modeCard" id="modeFunBtn">
+          <span class="modeIcon">🎉</span>
+          <span class="modeName">CHẾ ĐỘ GIẢI TRÍ</span>
+          <span class="modeDesc">Map ngẫu nhiên mỗi lượt chơi — Thời gian &amp; Speed</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="playTab" class="tab-content">
+      <button id="modeBackLink">◀ Chọn chế độ khác</button>
       <button id="continueBtn">▶ Chơi Tiếp</button>
       <div id="levelGrid"></div>
       <div class="footNote">Tiến trình, vàng và trang phục được lưu tự động.</div>
       <button id="resetBtn">XÓA TIẾN TRÌNH</button>
+    </div>
+
+    <div id="funModeTab" class="tab-content">
+      <button id="modeBackLink2">◀ Chọn chế độ khác</button>
+
+      <div id="funChooser">
+        <div id="funModeGrid">
+          <button class="modeCard" id="funTimeBtn">
+            <span class="modeIcon">⏱️</span>
+            <span class="modeName">CHẾ ĐỘ THỜI GIAN</span>
+            <span class="modeDesc">Map ngẫu nhiên. Về đích càng nhanh, huy chương càng cao: Đồng/Bạc/Vàng/Kim Cương/Ruby/Lục Bảo</span>
+          </button>
+          <button class="modeCard" id="funSpeedBtn">
+            <span class="modeIcon">⚡</span>
+            <span class="modeName">CHẾ ĐỘ SPEED</span>
+            <span class="modeDesc">Chọn tốc độ di chuyển trước khi chơi trên map ngẫu nhiên</span>
+          </button>
+          <button class="modeCard" id="funEndlessBtn">
+            <span class="modeIcon">🚩</span>
+            <span class="modeName">KHÔNG GIỚI HẠN</span>
+            <span class="modeDesc">Map vô tận, độ khó 5 sao — nhặt càng nhiều cờ càng nhiều vàng. Chết là kết thúc!</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="funSpeedChooser" style="display:none;">
+        <button id="funSpeedBackLink" class="modeSubBack">◀ Quay lại</button>
+        <div class="footNote" style="margin-bottom:14px;">Chọn tốc độ di chuyển:</div>
+        <div id="speedGrid">
+          <button class="speedBtn" data-speed="0.5">x0.5</button>
+          <button class="speedBtn" data-speed="1">x1</button>
+          <button class="speedBtn" data-speed="1.5">x1.5</button>
+          <button class="speedBtn" data-speed="2">x2</button>
+        </div>
+      </div>
     </div>
 
     <div id="skinsTab" class="tab-content">
@@ -235,6 +388,7 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
       <div class="stat-card"><div><span class="icon">💀</span><span class="label">Đã chết</span></div><div class="value" id="statDeaths">0</div></div>
       <div class="stat-card"><div><span class="icon">⏱</span><span class="label">Thời gian chơi</span></div><div class="value" id="statTime">0m</div></div>
       <div class="stat-card"><div><span class="icon">🔥</span><span class="label">Màn khó nhất</span></div><div class="value" id="statHardest">Chưa có</div></div>
+      <div class="stat-card"><div><span class="icon">🚩</span><span class="label">Kỷ lục cờ (Không Giới Hạn)</span></div><div class="value" id="statEndless">0</div></div>
     </div>
 
     <div id="settingsTab" class="tab-content">
@@ -247,6 +401,42 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
   </div>
 </div>
 <div id="menuToast"></div>
+
+<!-- ================= HOME SCREEN ================= -->
+<div id="homeScreen">
+  <div id="homeTopBar">
+    <button id="gearBtn" title="Cài đặt">⚙</button>
+    <div id="goldBadgeHome">💰 <span id="goldValHome">0</span></div>
+  </div>
+  <div id="homeCenter">
+    <h1 id="homeTitle">TÌM <span class="co">CỜ</span><span class="flagIcon">🚩</span></h1>
+    <div id="homeTagline">Tìm đích ẩn - Vượt mọi thử thách</div>
+    <button id="playNowBtn"><span class="tri">▶</span> CHƠI NGAY</button>
+    <div id="homeMenuGrid">
+      <button class="homeCard" id="skinsCard"><span class="icon">👕</span><span>TRANG PHỤC</span></button>
+      <button class="homeCard" id="dailyCard"><span class="icon">🎁</span><span>THƯỞNG HẰNG NGÀY</span></button>
+      <button class="homeCard" id="infoCard"><span class="icon">ℹ️</span><span>THÔNG TIN</span></button>
+    </div>
+  </div>
+  <div id="homeGroundWrap">
+    <div id="homeGround"></div>
+    <div id="homePlayer"></div>
+  </div>
+  <div id="homeVersion">VERSION 1.0.0</div>
+</div>
+
+<!-- ================= INFO MODAL ================= -->
+<div id="infoModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:360px; text-align:left;">
+    <h2 style="text-align:center;">THÔNG TIN</h2>
+    <div style="color:var(--text-dim); font-size:13px; line-height:1.8; margin-bottom:20px;">
+      Cờ đích ẩn ở đâu đó trên bản đồ. Cờ chỉ hiện ra sau khi bạn tìm được cờ báo hiệu (màu xanh). Hãy cẩn thận với các bẫy và dung nham!<br><br>
+      <b>Điều khiển:</b> Trái/Phải để di chuyển, phím nhảy để bật lên.<br><br>
+      Tiến trình, vàng và trang phục được lưu tự động trên thiết bị này.
+    </div>
+    <button class="modal-btn primary" onclick="document.getElementById('infoModal').classList.remove('show')">Đóng</button>
+  </div>
+</div>
 
 <!-- ================= DEV TOOL ================= -->
 <div id="devTool">
@@ -315,9 +505,10 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 <div class="row"><button id="backBtn">⏸ PAUSE</button></div>
 <div><span class="lbl">CẤP</span> <span class="val" id="lvlTag">1</span></div>
 <div><span class="lbl">CHẾT (LƯỢT NÀY)</span> <span class="val" id="dCnt">0</span></div>
-<div><span class="lbl">LẦN THỬ</span> <span class="val" id="attTag">0</span></div>
+<div id="attRow"><span class="lbl">LẦN THỬ</span> <span class="val" id="attTag">0</span></div>
 <div><span class="lbl">THỜI GIAN</span> <span class="val" id="tmr">0:00</span></div>
-<div><span class="lbl">CỜ ĐÍCH</span> <span class="val" id="fStat">ẨN</span></div>
+<div id="fStatRow"><span class="lbl">CỜ ĐÍCH</span> <span class="val" id="fStat">ẨN</span></div>
+<div id="flagRow" style="display:none;"><span class="lbl">CỜ ĐÃ NHẶT</span> <span class="val" id="flagCntHud">0</span></div>
 </div>
 <div id="goldHud">💰 <span id="goldValGame">0</span></div>
 <div id="msgBox"><div class="main" id="msgM"></div><div class="sub" id="msgS"></div></div>
@@ -336,7 +527,7 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 </div>
 
 <div id="win">
-  <h1>★ CHIẾN THẮNG ★</h1>
+  <h1 id="winTitle">★ CHIẾN THẮNG ★</h1>
   <div class="st" id="winSt"></div>
   <div class="row">
     <button id="nextLvlBtn">CẤP TIẾP THEO →</button>
@@ -417,7 +608,7 @@ function dev_setTimeScale(val){ dev.timeScale=val; }
 function dev_unlockAll(){ progress.unlocked=TOTAL_LEVELS; for(let i=1;i<=TOTAL_LEVELS;i++) progress.completed[i]=true; saveProgress(); renderMenu(); }
 function dev_lockAll(){ progress.unlocked=1; progress.completed={}; saveProgress(); renderMenu(); }
 function dev_resetSave(){ document.getElementById('resetBtn').click(); }
-function dev_finishLevel(){ if(gameActive) showWin(); }
+function dev_finishLevel(){ if(gameActive && funMode!=='endless') showWin(); }
 function dev_teleport(){ if(gameActive){ let x=prompt('X:', p.x); let y=prompt('Y:', p.y); if(x!==null && y!==null){ p.x=parseFloat(x); p.y=parseFloat(y); p.vx=0; p.vy=0; } } }
 
 /* ============== STORAGE ============== */
@@ -434,7 +625,8 @@ async function loadProgress(){
   if(typeof progress.gold !== 'number') progress.gold = 0;
   if(typeof progress.equipped !== 'number') progress.equipped = 0;
   if(!progress.settings) progress.settings = { sound: true, shake: true, particle: true, glow: true, trail: true };
-  if(!progress.stats) progress.stats = { totalPlays: 0, totalDeaths: 0, playTimeSec: 0, hardestLevel: 0 };
+  if(!progress.stats) progress.stats = { totalPlays: 0, totalDeaths: 0, playTimeSec: 0, hardestLevel: 0, bestEndlessFlags: 0 };
+  if(typeof progress.stats.bestEndlessFlags !== 'number') progress.stats.bestEndlessFlags = 0;
   if(!progress.daily) progress.daily = { lastClaim: null, streak: 0 };
 }
 
@@ -535,12 +727,13 @@ document.getElementById('btn-respawn').addEventListener('touchstart', (e)=>{e.pr
 document.getElementById('btn-respawn').addEventListener('mousedown', (e)=>{e.preventDefault();respawn();});
 
 /* Constants */
-const G=0.62,JUMP=-13.2,SPD=0.65,MAXSPD=5.2,FRIC=0.82,COYOTE=6,JBUF=6;
+const G=0.59,JUMP=-12.6,SPD=0.63,MAXSPD=4.4,FRIC=0.85,COYOTE=6,JBUF=6;
 const WORLD_H=720,GY=580;
 let WORLD_W=900;
 
 /* State */
 let curLevelNum=1, gameActive=false, isPaused=false;
+let funMode=null, funSpeedMult=1, funLevelBaseline=30; // funMode: null | 'time' | 'speed'
 let deaths=0,startTime=Date.now(),realFlagVis=false,fakeTouched=false,won=false;
 let shake=0,flashFx=0,particles=[],postReveal=false,lavaY=WORLD_H+50,msgT=0,msgMain='',msgSub='';
 
@@ -550,6 +743,11 @@ let cam={x:0,y:0};
 
 const plats=[], traps=[];
 let flagSpots=[], realFlag=null, fakeFlag=null;
+
+/* Chế độ KHÔNG GIỚI HẠN (endless) */
+let endlessFlags=[], endlessFlagCount=0, endlessRng=null, endlessX=0, endlessPendingSway=0, endlessBgX=0;
+const ENDLESS_LOOKAHEAD = 2600; // sinh thêm map khi người chơi còn cách rìa bấy nhiêu px
+const ENDLESS_TRIM_BEHIND = 3000; // dọn dẹp object đã ở lại phía sau bấy nhiêu px để đỡ tốn bộ nhớ
 
 function P(x,y,w,h,type,opts){
 plats.push({x,y,w,h,type:type||'static',sx:x,sy:y,
@@ -581,9 +779,9 @@ function mulberry32(seed){
 }
 
 /* ============== LEVEL GENERATOR ============== */
-function buildLevel(n){
+function buildLevel(n, seedOverride){
   plats.length=0; traps.length=0; flagSpots=[];
-  const rng = mulberry32(n*7919+13);
+  const rng = mulberry32(typeof seedOverride==='number' ? seedOverride : (n*7919+13));
 
   const sections   = Math.min(12, 4 + Math.round(n*0.25)); 
   const trapChance = Math.min(0.35, 0.05 + n*0.008); 
@@ -591,16 +789,21 @@ function buildLevel(n){
   const moveChance  = Math.min(0.15, 0.008*n);
 
   // ---- JUMP-SAFETY MODEL ----
-  // Simulated max horizontal distance the player can cover during one jump
-  // (G=0.62, JUMP=-13.2, SPD=0.65, MAXSPD=5.2, FRIC=0.82, full run-up) is ~124px.
-  // SAFE_MAX_GAP is kept well under that, with margin for imperfect play.
+  // Simulated horizontal distance the player can cover during one jump
+  // (G=0.59, JUMP=-12.6, SPD=0.63, MAXSPD=4.4, FRIC=0.85):
+  //   no run-up (min jump, key pressed only during the jump) ~130px
+  //   full run-up (already at max speed before leaving ground)  ~150px
+  // Gaps are always generated within GAP_MIN..GAP_MAX (100-125px), which sits
+  // comfortably under the ~130px minimum jump distance, so every jump on every
+  // map is makeable even with zero run-up.
   // Crucially, moving (moveX) platforms sway by up to `range`, which can add
   // to the EFFECTIVE gap the player must cross on either side of that platform.
   // The generator below always keeps gap + range <= SAFE_MAX_GAP, guaranteeing
   // every jump on every map is makeable at any moment (no waiting/timing required).
-  const SAFE_MAX_GAP = 100; // trimmed from 112 for extra jump-safety margin
-  const gapMin = 78+Math.min(10,n*0.3);
-  const gapMax = Math.min(SAFE_MAX_GAP, 90+Math.min(15,n*0.4));
+  const GAP_MIN = 100, GAP_MAX = 125;
+  const SAFE_MAX_GAP = GAP_MAX;
+  const gapMin = GAP_MIN;
+  const gapMax = GAP_MAX;
 
   const hazardPool=['spike'];
   if(n>=5) hazardPool.push('saw');
@@ -647,7 +850,7 @@ function buildLevel(n){
     groundStones.push({x:nx+w/2,y:GY});
 
     if(rng()<0.3){ 
-      // Max jump height is ~140px (JUMP^2/(2*G)); keep offset well under that (55-110)
+      // Max jump height is ~134px (JUMP^2/(2*G)); keep offset well under that (55-110)
       // so the stone is always reachable, but high enough to never touch/overlap the ground.
       const by = GY-(55+Math.round(rng()*55)); 
       const bx = nx + Math.round((rng()-0.5)*60); 
@@ -697,6 +900,213 @@ function buildLevel(n){
   realFlag = flagSpots[Math.floor(rng()*flagSpots.length)];
 
   return WORLD_W_new;
+}
+
+/* ============== CHẾ ĐỘ KHÔNG GIỚI HẠN (ENDLESS) ============== */
+// Độ khó cố định ở mức tối đa ("5 sao"): đủ mọi loại bẫy, tỉ lệ bẫy cao,
+// bẫy bất ngờ (fallblock/crusher/pendulum) xuất hiện ngay từ đầu.
+// Gap giữa các viên đá vẫn tuân thủ đúng mô hình an toàn nhảy (100-125px)
+// để đảm bảo luôn nhảy qua được — thử thách nằm ở bẫy, không phải ở gap.
+function buildEndlessChunk(sections){
+  sections = sections || 10;
+  const rng = endlessRng;
+  const trapChance = 0.42;
+  const fadeChance = 0.10;
+  const moveChance = 0.14;
+  const hazardPool = ['spike','saw','arrow','fallblock','crusher','pendulum'];
+
+  const GAP_MIN = 100, GAP_MAX = 125, SAFE_MAX_GAP = 125;
+
+  let x = endlessX;
+  let pendingSway = endlessPendingSway;
+
+  for(let i=0;i<sections;i++){
+    const effGapMax = Math.max(GAP_MIN, GAP_MAX-pendingSway);
+    const gap = Math.round(GAP_MIN+rng()*(effGapMax-GAP_MIN));
+    pendingSway = 0;
+    const w = 180+Math.round(rng()*120);
+    const nx = x+gap;
+
+    let placed=false;
+    if(rng()<fadeChance){
+      P(nx,GY,Math.round(w*0.75),18,'fade');
+      placed=true;
+    } else if(rng()<moveChance){
+      const isX = rng()<0.5;
+      if(isX){
+        const headroom = SAFE_MAX_GAP-gap-12;
+        const range = headroom>=10 ? Math.min(24,headroom) : 0;
+        if(range>0){
+          P(nx,GY,w,42,'moveX',{range,speed:0.012+rng()*0.01});
+          pendingSway = range;
+          placed=true;
+        }
+      } else {
+        const range = 20+Math.round(rng()*15);
+        P(nx,GY,w,42,'moveY',{range,speed:0.012+rng()*0.01});
+        pendingSway = Math.round(range*0.3);
+        placed=true;
+      }
+    }
+    if(!placed) P(nx,GY,w,42);
+
+    // Cờ: gần như mọi viên đá đều có cờ để nhặt (không giới hạn số lượng)
+    if(rng()<0.85){
+      endlessFlags.push({x:nx+w/2-9, y:GY-46, taken:false});
+    }
+
+    let floatY=null, floatMidX=null;
+    if(rng()<0.3){
+      const by = GY-(55+Math.round(rng()*55));
+      const bx = nx + Math.round((rng()-0.5)*60);
+      const bw = 120+Math.round(rng()*40);
+      P(bx,by,bw,18);
+      floatY=by; floatMidX=bx+bw/2;
+      if(rng()<0.7) endlessFlags.push({x:floatMidX-9, y:by-46, taken:false});
+    }
+
+    if(rng()<trapChance){
+      const type = hazardPool[Math.floor(rng()*hazardPool.length)];
+      const midx = x+gap*0.5;
+
+      if(type==='spike'){
+        T('spike', midx-20, GY-14, {w:30+Math.round(rng()*20), h:14});
+      } else if(type==='saw'){
+        T('saw', midx, GY-80-Math.round(rng()*40), {r:14, path: rng()<0.5?'h':'v', range:30+Math.round(rng()*15), speed:0.017});
+      } else if(type==='arrow'){
+        T('arrow', midx, GY-140, {dir: rng()<0.5?'right':'down', interval:70+Math.round(rng()*30)});
+      } else if(type==='fallblock'){
+        T('fallblock', midx, 80, {w:50,h:35, trigX:midx-40, trigW:110});
+      } else if(type==='crusher'){
+        T('crusher', midx, 80, {w:60, h:35, range:180, speed:0.014});
+      } else if(type==='pendulum'){
+        T('pendulum', midx, 50, {len:120, range:0.75, speed:0.02});
+      }
+    }
+    x = nx+w;
+  }
+
+  endlessX = x;
+  endlessPendingSway = pendingSway;
+  if(endlessX+300 > WORLD_W) WORLD_W = endlessX+300;
+  extendEndlessBackground(WORLD_W+300);
+}
+
+function extendEndlessBackground(toX){
+  const brng = endlessRng;
+  let lastHill = bgHills.length ? bgHills[bgHills.length-1] : {x:-200,w:0};
+  let hx = lastHill.x + lastHill.w*0.7;
+  while(hx<toX){
+    const hw=260+brng()*220, hh=60+brng()*70;
+    bgHills.push({x:hx,w:hw,h:hh});
+    hx+=hw*0.7;
+  }
+  let lastHouse = bgHouses.length ? bgHouses[bgHouses.length-1] : {x:-150,w:0};
+  let px = lastHouse.x + lastHouse.w + 30;
+  while(px<toX){
+    const w=46+brng()*36, h=34+brng()*30;
+    const c=brng()<0.5?bgTheme.house[0]:bgTheme.house[1];
+    const hasWindowGlow = bgTheme.night && brng()<0.6;
+    bgHouses.push({x:px,w,h,color:c,roof:bgTheme.roof,glow:hasWindowGlow});
+    px+=w+30+brng()*70;
+  }
+  let lastTree = bgTrees.length ? bgTrees[bgTrees.length-1] : {x:-150};
+  let tx = lastTree.x + 18;
+  while(tx<toX){
+    const trunkH=18+brng()*14, foliageR=16+brng()*16;
+    tx+=18+brng()*55;
+    bgTrees.push({x:tx,trunkH,foliageR,color:bgTheme.tree});
+  }
+  if(bgTheme.night){
+    while(endlessBgX<toX){
+      bgStars.push({x:endlessBgX+Math.random()*300,y:Math.random()*380,s:Math.random()*2+0.5,tw:Math.random()*6.28});
+      endlessBgX+=300;
+    }
+  } else {
+    endlessBgX = toX;
+  }
+}
+
+// Dọn dẹp object đã xa phía sau người chơi để tránh mảng phình to vô hạn
+function trimEndlessBehind(){
+  const cutX = p.x - ENDLESS_TRIM_BEHIND;
+  if(cutX<=0) return;
+  for(let i=plats.length-1;i>=0;i--){ if(plats[i].x+plats[i].w<cutX) plats.splice(i,1); }
+  for(let i=traps.length-1;i>=0;i--){ if(traps[i].x<cutX) traps.splice(i,1); }
+  for(let i=endlessFlags.length-1;i>=0;i--){ if(endlessFlags[i].x<cutX) endlessFlags.splice(i,1); }
+}
+
+function startEndlessLevel(){
+  ensureAudio();
+  if(document.activeElement) document.activeElement.blur();
+
+  funMode = 'endless';
+  funSpeedMult = 1;
+  curLevelNum = 0;
+
+  plats.length=0; traps.length=0; flagSpots=[]; endlessFlags=[]; endlessFlagCount=0;
+  endlessRng = mulberry32(Math.floor(Math.random()*1e9));
+  endlessX = 0; endlessPendingSway = 0; endlessBgX = 0;
+
+  P(0,GY,420,42);
+  endlessX = 420;
+  WORLD_W = 900;
+
+  genStars(Math.floor(Math.random()*100000));
+  endlessBgX = WORLD_W;
+  for(let i=0;i<4;i++) buildEndlessChunk(10);
+
+  deaths=0; startTime=Date.now(); realFlagVis=false; fakeTouched=false; won=false;
+  shake=0; flashFx=0; particles=[]; postReveal=false; lavaY=WORLD_H+50; msgT=0;
+  p.x=SPAWN.x; p.y=SPAWN.y; p.vx=0; p.vy=0; p.onG=false; p.alive=true; p.trail=[]; p.deathT=0; p.squashX=1; p.squashY=1;
+  cam.x=0; cam.y=0;
+
+  document.getElementById('dCnt').textContent='0';
+  document.getElementById('lvlTag').textContent='♾ KHÔNG GIỚI HẠN';
+  document.getElementById('attTag').textContent='—';
+  document.getElementById('flagCntHud').textContent='0';
+  setHudEndlessMode(true);
+  document.getElementById('win').style.display='none';
+  hideMsg();
+
+  document.getElementById('menuScreen').style.display='none';
+  document.getElementById('pauseModal').classList.remove('show');
+  document.getElementById('gameWrap').style.display='block';
+  gameActive = true;
+  isPaused = false;
+
+  progress.stats.totalPlays++;
+  saveProgress();
+}
+
+function setHudEndlessMode(on){
+  document.getElementById('attRow').style.display = on ? 'none' : '';
+  document.getElementById('fStatRow').style.display = on ? 'none' : '';
+  document.getElementById('flagRow').style.display = on ? '' : 'none';
+}
+
+function endlessGoldForFlags(n){
+  const mult = Math.max(1, Math.floor(n/10));
+  return {mult, gold: n*100*mult};
+}
+
+function endEndlessRun(){
+  sndDeath();
+  const {mult, gold} = endlessGoldForFlags(endlessFlagCount);
+  progress.gold += gold;
+  const isRecord = endlessFlagCount > (progress.stats.bestEndlessFlags||0);
+  if(isRecord) progress.stats.bestEndlessFlags = endlessFlagCount;
+  saveProgress();
+
+  document.getElementById('winTitle').textContent = '💀 KẾT THÚC 💀';
+  document.getElementById('win').style.display='flex';
+  document.getElementById('winSt').innerHTML =
+    `Cờ đã nhặt: <b>${endlessFlagCount}</b>${isRecord?' <span style="color:var(--gold)">(KỶ LỤC MỚI!)</span>':''}<br>`+
+    `Hệ số thưởng: <b>x${mult}</b><br>`+
+    `Vàng nhận được: <b>+${gold}</b> 💰`;
+  document.getElementById('nextLvlBtn').textContent = '🔁 CHƠI LẠI';
+  document.getElementById('nextLvlBtn').style.display = 'inline-block';
+  gameActive = false;
 }
 
 /* ============== BACKGROUND THEMES ============== */
@@ -767,6 +1177,7 @@ function startLevel(n){
   document.getElementById('dCnt').textContent='0';
   document.getElementById('lvlTag').textContent=n;
   updateAttTag();
+  setHudEndlessMode(false);
   document.getElementById('win').style.display='none';
   hideMsg();
 
@@ -783,6 +1194,96 @@ function startLevel(n){
 
 function updateAttTag(){
   document.getElementById('attTag').textContent = progress.attempts[curLevelNum]||0;
+}
+
+/* ============== CHẾ ĐỘ GIẢI TRÍ (RANDOM MAP) ============== */
+function buildRandomLevel(){
+  // Độ khó ngẫu nhiên -> số bẫy, số đoạn (quãng đường) ngẫu nhiên mỗi lượt
+  const diffN = 3 + Math.floor(Math.random()*70);
+  const seed = Math.floor(Math.random()*1e9);
+  const w = buildLevel(diffN, seed);
+  genStars(Math.floor(Math.random()*100000));
+  // Ước lượng thời gian nền để chấm huy chương (tỉ lệ theo độ dài map)
+  funLevelBaseline = 12 + w/110;
+  return w;
+}
+
+function startFunLevel(mode, speedMult){
+  ensureAudio();
+  if(document.activeElement) document.activeElement.blur();
+
+  funMode = mode;
+  funSpeedMult = mode==='speed' ? (speedMult||funSpeedMult||1) : 1;
+
+  curLevelNum = 0;
+  WORLD_W = buildRandomLevel();
+
+  deaths=0; startTime=Date.now(); realFlagVis=false; fakeTouched=false; won=false;
+  shake=0; flashFx=0; particles=[]; postReveal=false; lavaY=WORLD_H+50; msgT=0;
+  p.x=SPAWN.x; p.y=SPAWN.y; p.vx=0; p.vy=0; p.onG=false; p.alive=true; p.trail=[]; p.deathT=0; p.squashX=1; p.squashY=1;
+  cam.x=0; cam.y=0;
+
+  document.getElementById('dCnt').textContent='0';
+  document.getElementById('lvlTag').textContent = mode==='speed' ? ('⚡ x'+funSpeedMult) : '⏱ Ngẫu Nhiên';
+  document.getElementById('attTag').textContent='—';
+  setHudEndlessMode(false);
+  document.getElementById('win').style.display='none';
+  hideMsg();
+
+  document.getElementById('menuScreen').style.display='none';
+  document.getElementById('pauseModal').classList.remove('show');
+  document.getElementById('gameWrap').style.display='block';
+  gameActive = true;
+  isPaused = false;
+
+  progress.stats.totalPlays++;
+  saveProgress();
+}
+
+const FUN_MEDALS = [
+  {id:'emerald', name:'Lục Bảo',   icon:'💚', mult:0.55, color:'#2ecc71', reward:60},
+  {id:'ruby',    name:'Ruby',      icon:'❤️', mult:0.7,  color:'#ff3355', reward:50},
+  {id:'diamond', name:'Kim Cương', icon:'💎', mult:0.85, color:'#7fdbff', reward:40},
+  {id:'gold',    name:'Vàng',      icon:'🥇', mult:1.05, color:'#ffd700', reward:30},
+  {id:'silver',  name:'Bạc',       icon:'🥈', mult:1.35, color:'#c0c0c0', reward:22},
+  {id:'bronze',  name:'Đồng',      icon:'🥉', mult:Infinity, color:'#cd7f32', reward:15},
+];
+function getFunMedal(t, baseline){
+  for(const m of FUN_MEDALS){ if(t <= baseline*m.mult) return m; }
+  return FUN_MEDALS[FUN_MEDALS.length-1];
+}
+function showFunWinTime(t){
+  document.getElementById('winTitle').textContent = '★ CHIẾN THẮNG ★';
+  const medal = getFunMedal(t, funLevelBaseline);
+  progress.gold += medal.reward;
+  saveProgress();
+
+  document.getElementById('win').style.display='flex';
+  let m=Math.floor(t/60), s=t%60;
+  document.getElementById('winSt').innerHTML =
+    `<div style="font-size:40px;margin:4px 0 8px;">${medal.icon}</div>`+
+    `<div style="color:${medal.color};font-weight:bold;letter-spacing:2px;margin-bottom:10px;">HUY CHƯƠNG ${medal.name.toUpperCase()}</div>`+
+    `Thời gian về đích: <b>${m}:${s.toString().padStart(2,'0')}</b><br>`+
+    `Số lần chết: <b>${deaths}</b><br>`+
+    `Vàng nhận được: <b>+${medal.reward}</b> 💰`;
+  document.getElementById('nextLvlBtn').textContent = '🔁 CHƠI LẠI (MAP MỚI)';
+  document.getElementById('nextLvlBtn').style.display='inline-block';
+}
+function showFunWinSpeed(t){
+  document.getElementById('winTitle').textContent = '★ CHIẾN THẮNG ★';
+  const reward = 20;
+  progress.gold += reward;
+  saveProgress();
+
+  document.getElementById('win').style.display='flex';
+  let m=Math.floor(t/60), s=t%60;
+  document.getElementById('winSt').innerHTML =
+    `Tốc độ đã chọn: <b>x${funSpeedMult}</b><br>`+
+    `Thời gian về đích: <b>${m}:${s.toString().padStart(2,'0')}</b><br>`+
+    `Số lần chết: <b>${deaths}</b><br>`+
+    `Vàng nhận được: <b>+${reward}</b> 💰`;
+  document.getElementById('nextLvlBtn').textContent = '🔁 CHƠI LẠI (MAP MỚI)';
+  document.getElementById('nextLvlBtn').style.display='inline-block';
 }
 
 function pauseGame() {
@@ -802,6 +1303,9 @@ function resumeGame() {
 function restartGame() {
   document.getElementById('pauseModal').classList.remove('show');
   isPaused = false;
+  if(funMode==='time'){ startFunLevel('time'); return; }
+  if(funMode==='speed'){ startFunLevel('speed', funSpeedMult); return; }
+  if(funMode==='endless'){ startEndlessLevel(); return; }
   startLevel(curLevelNum);
 }
 function quitToMenu() {
@@ -818,19 +1322,35 @@ function backToMenu(){
   }
   gameActive=false;
   document.getElementById('gameWrap').style.display='none';
-  document.getElementById('menuScreen').style.display='flex';
   document.getElementById('win').style.display='none';
   renderMenu();
+  if(funMode){
+    funMode=null; funSpeedMult=1;
+    document.getElementById('homeScreen').style.display='none';
+    document.getElementById('menuScreen').style.display='flex';
+    document.getElementById('tabs').style.display='none';
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('show'));
+    document.getElementById('funModeTab').classList.add('show');
+    showFunChooser();
+  } else {
+    goHome();
+  }
 }
 document.getElementById('backBtn').addEventListener('click', pauseGame);
 
 function updateP(){
-if(!p.alive){p.deathT++;if(p.deathT>40)respawn();return}
+if(!p.alive){
+  p.deathT++;
+  if(p.deathT>40){
+    if(funMode==='endless'){ endEndlessRun(); } else { respawn(); }
+  }
+  return
+}
 let mvL=keys['ArrowLeft']||keys['KeyA'],mvR=keys['ArrowRight']||keys['KeyD'];
 let jmp=keys['Space']||keys['ArrowUp']||keys['KeyW'];
 
-let spd = SPD * dev.speedMod;
-let maxspd = MAXSPD * dev.speedMod;
+let spd = SPD * dev.speedMod * funSpeedMult;
+let maxspd = MAXSPD * dev.speedMod * funSpeedMult;
 
 if(mvL){p.vx-=spd;p.face=-1}
 if(mvR){p.vx+=spd;p.face=1}
@@ -929,20 +1449,40 @@ if(!dev.noClip && !dev.godMode){
   }
 }
 
-if(!fakeTouched && rI(p, {x:fakeFlag.x, y:fakeFlag.y, w:30, h:50})){
-  fakeTouched = true; realFlagVis = true; postReveal = true;
-  // Bỏ cơ chế tạo bẫy khi chạm cờ giả
-  // for(const pt of postTrapsData){T(pt.type,pt.x,pt.y,pt)}
-  // for(const pl of plats){if(pl.postMove)pl.type=pl.axis==='x'?'moveX':'moveY';}
-  lavaY = WORLD_H;
-  sndReveal();
-  let msg = fakeMsgs[Math.floor(Math.random()*fakeMsgs.length)];
-  showMsg(msg, 'Cờ đích thật đã xuất hiện ở đâu đó... Tìm đi!');
-  flashFx = 1; shake = 25;
-}
+if(funMode!=='endless'){
+  if(!fakeTouched && rI(p, {x:fakeFlag.x, y:fakeFlag.y, w:30, h:50})){
+    fakeTouched = true; realFlagVis = true; postReveal = true;
+    // Bỏ cơ chế tạo bẫy khi chạm cờ giả
+    // for(const pt of postTrapsData){T(pt.type,pt.x,pt.y,pt)}
+    // for(const pl of plats){if(pl.postMove)pl.type=pl.axis==='x'?'moveX':'moveY';}
+    lavaY = WORLD_H;
+    sndReveal();
+    let msg = fakeMsgs[Math.floor(Math.random()*fakeMsgs.length)];
+    showMsg(msg, 'Cờ đích thật đã xuất hiện ở đâu đó... Tìm đi!');
+    flashFx = 1; shake = 25;
+  }
 
-if(realFlagVis && rI(p, {x:realFlag.x, y:realFlag.y, w:30, h:50})){
-  won = true; showWin();
+  if(realFlagVis && rI(p, {x:realFlag.x, y:realFlag.y, w:30, h:50})){
+    won = true; showWin();
+  }
+} else {
+  for(const f of endlessFlags){
+    if(!f.taken && rI(p, {x:f.x, y:f.y, w:26, h:46})){
+      f.taken = true;
+      endlessFlagCount++;
+      document.getElementById('flagCntHud').textContent = endlessFlagCount;
+      sndReveal();
+      if(progress.settings.particle){
+        for(let i=0;i<10;i++){
+          particles.push({x:f.x+13,y:f.y+20,
+          vx:(Math.random()-0.5)*4,vy:-1-Math.random()*2,
+          life:22+Math.random()*10,color:'#ffd700',size:2+Math.random()*3});
+        }
+      }
+    }
+  }
+  if(p.x > endlessX - ENDLESS_LOOKAHEAD) buildEndlessChunk(10);
+  trimEndlessBehind();
 }
 
 if(p.y>WORLD_H+100){kill();return}
@@ -1027,9 +1567,11 @@ if(dev.godMode) return;
 if(!p.alive)return;
 p.alive=false;p.deathT=0;deaths++;shake=18;flashFx=1;
 sndDeath();
-progress.attempts[curLevelNum]=(progress.attempts[curLevelNum]||0)+1;
+if(!funMode){
+  progress.attempts[curLevelNum]=(progress.attempts[curLevelNum]||0)+1;
+  updateAttTag();
+}
 progress.stats.totalDeaths++;
-updateAttTag();
 saveProgress();
 if(progress.settings.particle){
   for(let i=0;i<25;i++){
@@ -1065,6 +1607,12 @@ let t = Math.floor((Date.now() - startTime) / 1000);
 progress.stats.playTimeSec += t;
 startTime = Date.now(); 
 
+if(funMode==='time'){ showFunWinTime(t); return; }
+if(funMode==='speed'){ showFunWinSpeed(t); return; }
+document.getElementById('winTitle').textContent = '★ CHIẾN THẮNG ★';
+
+document.getElementById('nextLvlBtn').textContent = 'CẤP TIẾP THEO →';
+
 const baseReward = 20 + curLevelNum*4 + Math.max(0, 8-Math.min(8,deaths));
 const firstTime = !progress.completed[curLevelNum];
 const reward = firstTime ? baseReward : Math.round(baseReward*0.3);
@@ -1089,7 +1637,12 @@ document.getElementById('winSt').innerHTML=
 `Số lần chết: <b>${deaths}</b><br>Thời gian: <b>${m}:${s.toString().padStart(2,'0')}</b><br>Vị trí cờ: <b>${realFlag.desc}</b><br>Vàng nhận được: <b>+${reward}</b> 💰${milestoneMsg}`;
 document.getElementById('nextLvlBtn').style.display = curLevelNum>=TOTAL_LEVELS ? 'none' : 'inline-block';
 }
-document.getElementById('nextLvlBtn').addEventListener('click', ()=>startLevel(Math.min(TOTAL_LEVELS,curLevelNum+1)));
+document.getElementById('nextLvlBtn').addEventListener('click', ()=>{
+  if(funMode==='time'){ startFunLevel('time'); return; }
+  if(funMode==='speed'){ startFunLevel('speed', funSpeedMult); return; }
+  if(funMode==='endless'){ startEndlessLevel(); return; }
+  startLevel(Math.min(TOTAL_LEVELS,curLevelNum+1));
+});
 document.getElementById('winMenuBtn').addEventListener('click', backToMenu);
 
 function spawnJumpDust(){
@@ -1352,12 +1905,21 @@ cx.fillStyle='rgba(80,40,60,0.5)';cx.fillRect(t.x,t.y,t.w,t.h);
 }
 }
 
-if(!fakeTouched){drawFlag(fakeFlag.x,fakeFlag.y,'#22dd44',false)}
-if(realFlagVis&&!won){
-let glow=0.5+Math.sin(Date.now()*0.005)*0.3;
-cx.fillStyle=`rgba(255,215,0,${glow*0.15})`;
-cx.beginPath();cx.arc(realFlag.x+15,realFlag.y+25,50,0,6.28);cx.fill();
-drawFlag(realFlag.x,realFlag.y,'#ffd700',true);
+if(funMode!=='endless'){
+  if(!fakeTouched){drawFlag(fakeFlag.x,fakeFlag.y,'#22dd44',false)}
+  if(realFlagVis&&!won){
+    let glow=0.5+Math.sin(Date.now()*0.005)*0.3;
+    cx.fillStyle=`rgba(255,215,0,${glow*0.15})`;
+    cx.beginPath();cx.arc(realFlag.x+15,realFlag.y+25,50,0,6.28);cx.fill();
+    drawFlag(realFlag.x,realFlag.y,'#ffd700',true);
+  }
+} else {
+  for(const f of endlessFlags){
+    if(f.taken) continue;
+    let vis=f.x+30>=cam.x-50&&f.x<=cam.x+W+50;
+    if(!vis) continue;
+    drawFlag(f.x,f.y,'#ffd700',false);
+  }
 }
 
 if(progress.settings.trail){
@@ -1477,11 +2039,13 @@ mmCx.fillStyle='rgba(20,20,30,0.8)';mmCx.fillRect(0,0,200,30);
 let sx=200/WORLD_W;
 mmCx.fillStyle='rgba(80,80,80,0.5)';mmCx.fillRect(0,20,200,2);
 mmCx.fillStyle='#e0f0ff';mmCx.fillRect(p.x*sx-1,15,3,8);
-if(!fakeTouched){
-mmCx.fillStyle='#22dd44';mmCx.fillRect(fakeFlag.x*sx-1,18,3,5);
-}
-if(realFlagVis&&!won){
-mmCx.fillStyle='#ffd700';mmCx.fillRect(realFlag.x*sx-1,18,3,5);
+if(funMode!=='endless'){
+  if(!fakeTouched){
+  mmCx.fillStyle='#22dd44';mmCx.fillRect(fakeFlag.x*sx-1,18,3,5);
+  }
+  if(realFlagVis&&!won){
+  mmCx.fillStyle='#ffd700';mmCx.fillRect(realFlag.x*sx-1,18,3,5);
+  }
 }
 mmCx.strokeStyle='rgba(255,68,68,0.3)';mmCx.lineWidth=1;
 mmCx.strokeRect(0,0,200,30);
@@ -1524,6 +2088,104 @@ function loop(){
 
   requestAnimationFrame(loop);
 }
+
+/* ============== HOME SCREEN LOGIC ============== */
+function goHome(){
+  document.getElementById('menuScreen').style.display='none';
+  document.getElementById('homeScreen').style.display='flex';
+  renderHome();
+}
+function openMenuTab(tabName){
+  ensureAudio(); sndClick();
+  document.getElementById('homeScreen').style.display='none';
+  document.getElementById('menuScreen').style.display='flex';
+
+  if(tabName==='play'){
+    // Chơi ngay -> chỉ hiện màn chọn chế độ, ẩn thanh tab ngang
+    document.getElementById('tabs').style.display='none';
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('show'));
+    document.getElementById('modeSelectTab').classList.add('show');
+    return;
+  }
+
+  // Các lối vào khác (skins/daily/stats/settings): giữ nguyên thanh tab như cũ
+  document.getElementById('tabs').style.display='flex';
+  document.querySelectorAll('.tabBtn').forEach(b=>b.classList.remove('active'));
+  const btn = document.querySelector('.tabBtn[data-tab="'+tabName+'"]');
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('show'));
+  document.getElementById(tabName+'Tab').classList.add('show');
+  if(tabName==='skins') renderSkinGrid();
+  if(tabName==='stats') renderStats();
+}
+
+function showPlayModeSelect(){
+  ensureAudio(); sndClick();
+  document.getElementById('tabs').style.display='none';
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('show'));
+  document.getElementById('modeSelectTab').classList.add('show');
+}
+function selectPlayMode(mode){
+  ensureAudio(); sndClick();
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('show'));
+  if(mode==='normal'){
+    document.getElementById('playTab').classList.add('show');
+  } else if(mode==='fun'){
+    document.getElementById('funModeTab').classList.add('show');
+    showFunChooser();
+  }
+}
+document.getElementById('modeNormalBtn').addEventListener('click', ()=>selectPlayMode('normal'));
+document.getElementById('modeFunBtn').addEventListener('click', ()=>selectPlayMode('fun'));
+document.getElementById('modeBackLink').addEventListener('click', showPlayModeSelect);
+document.getElementById('modeBackLink2').addEventListener('click', showPlayModeSelect);
+
+/* ---- Chế độ giải trí: chọn Thời gian / Speed ---- */
+function showFunChooser(){
+  document.getElementById('funChooser').style.display='block';
+  document.getElementById('funSpeedChooser').style.display='none';
+}
+document.getElementById('funTimeBtn').addEventListener('click', ()=>{
+  ensureAudio(); sndClick();
+  startFunLevel('time');
+});
+document.getElementById('funSpeedBtn').addEventListener('click', ()=>{
+  ensureAudio(); sndClick();
+  document.getElementById('funChooser').style.display='none';
+  document.getElementById('funSpeedChooser').style.display='block';
+});
+document.getElementById('funSpeedBackLink').addEventListener('click', ()=>{
+  ensureAudio(); sndClick();
+  showFunChooser();
+});
+document.getElementById('funEndlessBtn').addEventListener('click', ()=>{
+  ensureAudio(); sndClick();
+  startEndlessLevel();
+});
+document.querySelectorAll('.speedBtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    ensureAudio(); sndClick();
+    const mult = parseFloat(btn.dataset.speed);
+    startFunLevel('speed', mult);
+  });
+});
+function renderHome(){
+  const homeGold = document.getElementById('goldValHome');
+  if(homeGold) homeGold.textContent = progress.gold;
+  const playerEl = document.getElementById('homePlayer');
+  if(playerEl){
+    const skin = getSkin(progress.equipped);
+    playerEl.style.background = skin.type==='milestone' ? milestonePreview(skin.special) : skin.color;
+  }
+}
+document.getElementById('playNowBtn').addEventListener('click', ()=>openMenuTab('play'));
+document.getElementById('skinsCard').addEventListener('click', ()=>openMenuTab('skins'));
+document.getElementById('dailyCard').addEventListener('click', ()=>openMenuTab('daily'));
+document.getElementById('gearBtn').addEventListener('click', ()=>openMenuTab('settings'));
+document.getElementById('infoCard').addEventListener('click', ()=>{
+  ensureAudio(); sndClick();
+  document.getElementById('infoModal').classList.add('show');
+});
 
 /* ============== MENU LOGIC ============== */
 function renderMenu() {
@@ -1671,6 +2333,7 @@ function renderStats() {
   document.getElementById('statTime').textContent = timeStr;
   
   document.getElementById('statHardest').textContent = progress.stats.hardestLevel > 0 ? 'Lv ' + progress.stats.hardestLevel : 'Chưa có';
+  document.getElementById('statEndless').textContent = (progress.stats.bestEndlessFlags||0) + ' lá';
 }
 
 /* ============== SETTINGS ============== */
@@ -1708,7 +2371,7 @@ document.getElementById('continueBtn').addEventListener('click', ()=>{
 });
 document.getElementById('resetBtn').addEventListener('click', async ()=>{
   if(!confirm('Xoá toàn bộ tiến trình, vàng, setting và thống kê?')) return;
-  progress = { unlocked:1, completed:{}, attempts:{}, gold:0, owned:[], equipped:0, settings:{sound:true,shake:true,particle:true,glow:true,trail:true}, stats:{totalPlays:0,totalDeaths:0,playTimeSec:0,hardestLevel:0}, daily:{lastClaim:null,streak:0} };
+  progress = { unlocked:1, completed:{}, attempts:{}, gold:0, owned:[], equipped:0, settings:{sound:true,shake:true,particle:true,glow:true,trail:true}, stats:{totalPlays:0,totalDeaths:0,playTimeSec:0,hardestLevel:0,bestEndlessFlags:0}, daily:{lastClaim:null,streak:0} };
   await saveProgress();
   renderMenu();
 });
@@ -1725,6 +2388,7 @@ function flashToast(msg){
 (async function init(){
   await loadProgress();
   renderMenu();
+  renderHome();
   requestAnimationFrame(loop);
 })();
 </script>
