@@ -3,7 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="screen-orientation" content="landscape">
+<meta name="x5-orientation" content="landscape">
+<meta name="x5-fullscreen" content="true">
 <title>Tìm Cờ</title>
+<!-- ===== PWA (cài lên điện thoại + chơi offline) ===== -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a12">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tìm Cờ">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <style>
 :root {
   --bg: #0a0a12;
@@ -24,6 +36,28 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 #hud .row{display:flex;align-items:center;gap:10px}
 #backBtn{pointer-events:auto;cursor:pointer;background:rgba(255,68,68,.12);border:1px solid rgba(255,68,68,.55);color:#ff8888;padding:6px 14px;font-size:11px;letter-spacing:1px;font-family:inherit;border-radius:4px;transition:.2s}
 #backBtn:hover{background:rgba(255,68,68,.3)}
+#fsBtn{pointer-events:auto;cursor:pointer;background:rgba(150,150,200,.12);border:1px solid rgba(150,150,200,.5);color:#cfd0ff;padding:6px 10px;font-size:13px;font-family:inherit;border-radius:4px;transition:.2s;line-height:1}
+#fsBtn:hover{background:rgba(150,150,200,.3)}
+
+/* ================= FORCE LANDSCAPE ================= */
+#rotateOverlay{
+  display:none;
+  position:fixed; inset:0; z-index:1000;
+  background:#08060c;
+  color:#eee; font-family:'Courier New',monospace;
+  flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  padding:20px;
+}
+#rotateOverlay .icon{ font-size:64px; animation:rotateHint 1.6s ease-in-out infinite; margin-bottom:18px; }
+#rotateOverlay .msg{ font-size:16px; letter-spacing:1px; color:#ddd; }
+#rotateOverlay .sub{ font-size:12px; color:#777; margin-top:8px; }
+@keyframes rotateHint{
+  0%,100%{ transform:rotate(0deg); }
+  50%{ transform:rotate(90deg); }
+}
+@media (orientation:portrait) and (pointer:coarse){
+  #rotateOverlay{ display:flex; }
+}
 #msgBox{position:fixed;top:35%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:60;pointer-events:none;opacity:0;transition:opacity .3s}
 #msgBox.show{opacity:1}
 #msgBox .main{color:#ff3333;font-size:28px;font-weight:bold;letter-spacing:3px;text-shadow:0 0 20px rgba(255,51,51,.6)}
@@ -42,15 +76,29 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 #win button.alt:hover{background:#333}
 
 /* Touch Controls */
-#touch-ui{position:fixed;bottom:0;left:0;width:100%;height:200px;z-index:100;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 20px 25px}
-.t-group{display:flex;align-items:flex-end;gap:15px;pointer-events:auto}
-.t-btn{width:75px;height:75px;background:rgba(50,50,70,0.5);border:2px solid rgba(150,150,200,0.4);border-radius:50%;color:#fff;font-size:24px;font-weight:bold;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:background .1s,transform .05s}
-.t-btn:active,.t-btn.active{background:rgba(255,68,68,0.6);border-color:rgba(255,100,100,0.8);transform:scale(0.95)}
-#btn-jump{width:85px;height:85px;font-size:14px;background:rgba(50,100,200,0.4);border-color:rgba(100,150,255,0.6)}
+#touch-ui{position:fixed;bottom:0;left:0;width:100%;height:auto;z-index:100;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 4vw max(20px,4vh)}
+.t-group{display:flex;align-items:flex-end;gap:3vw;pointer-events:auto}
+.t-btn{
+  width:clamp(56px,16vw,80px);height:clamp(56px,16vw,80px);
+  background:rgba(50,50,70,0.5);border:2px solid rgba(150,150,200,0.4);border-radius:50%;color:#fff;
+  font-size:clamp(18px,5vw,26px);font-weight:bold;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:background .1s,transform .05s;
+  position:relative;
+}
+.t-btn:active,.t-btn.active{background:rgba(255,68,68,0.6);border-color:rgba(255,100,100,0.8);transform:scale(0.92)}
+#btn-jump{width:clamp(64px,19vw,92px);height:clamp(64px,19vw,92px);font-size:clamp(12px,3.4vw,15px);background:rgba(50,100,200,0.4);border-color:rgba(100,150,255,0.6)}
 #btn-jump:active,#btn-jump.active{background:rgba(100,150,255,0.7)}
-#btn-respawn{width:60px;height:60px;font-size:12px;background:rgba(150,50,50,0.4);border-color:rgba(255,100,100,0.5)}
-#btn-respawn:active{background:rgba(255,68,68,0.7)}
+.t-btn::after{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 0 rgba(255,255,255,.55);opacity:0;pointer-events:none;}
+.t-btn.pulse::after{animation:tBtnPulse .45s ease-out;}
+@keyframes tBtnPulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.55);opacity:1;}100%{box-shadow:0 0 0 16px rgba(255,255,255,0);opacity:0;}}
 @media(min-width:1024px){#touch-ui{display:none}}
+
+/* ================= FADE TO BLACK TRANSITION ================= */
+#fadeOverlay{
+  position:fixed; inset:0; background:#000; z-index:500;
+  opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+#fadeOverlay.show{ opacity:1; pointer-events:auto; }
 
 /* ================= MODALS ================= */
 .modal-overlay {
@@ -126,7 +174,7 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
   color:#fff; font-family:inherit; font-weight:bold; font-size:17px; letter-spacing:1px; cursor:pointer; transition:.2s;
 }
 .speedBtn:hover{ border-color:var(--accent); color:#ff8888; transform:translateY(-3px); box-shadow:0 0 16px rgba(255,68,68,.15); }
-#tabs{ display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; }
+#tabs{ display:none; }
 .tabBtn{
   background:var(--card); border:1px solid var(--border); color:var(--text-dim); font-family:inherit;
   padding:10px 16px; font-size:12px; letter-spacing:1px; cursor:pointer; text-transform:uppercase; border-radius:6px; transition:.2s;
@@ -143,14 +191,19 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 }
 #continueBtn:hover{ background:#ff6666; transform:translateY(-2px); }
 
-#levelGrid{ display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:14px; }
-@media(max-width:600px){ #levelGrid{ grid-template-columns:repeat(5,1fr);} }
+#levelGrid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:0 auto 10px; max-width:360px; }
 .lvlTile{
   position:relative; aspect-ratio:1/1; border:1px solid var(--border); background:var(--card);
   display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;
-  color:#ddd; font-weight:bold; font-size:15px; border-radius:8px; transition:.2s;
+  color:#ddd; font-weight:bold; font-size:13px; border-radius:8px; transition:.2s;
 }
-.lvlTile .att{ font-size:9px; color:#666; margin-top:2px; }
+.lvlTile .att{ font-size:8px; color:#666; margin-top:2px; }
+#levelPager{ display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:14px; }
+#levelPager button{ background:var(--card); border:1px solid var(--border); color:#ddd; width:34px; height:34px;
+  border-radius:6px; cursor:pointer; font-size:14px; font-weight:bold; transition:.2s; }
+#levelPager button:hover:not(:disabled){ border-color:var(--accent); color:var(--accent); }
+#levelPager button:disabled{ opacity:.35; cursor:not-allowed; }
+#levelPageInd{ font-size:13px; color:#999; min-width:70px; text-align:center; }
 .lvlTile.unlocked:hover{ border-color:var(--accent); color:var(--accent); transform:scale(1.05); }
 .lvlTile.completed{ border-color:#33cc77; color:#44dd88; }
 .lvlTile.completed:hover{ background:rgba(51,204,119,0.1); }
@@ -162,21 +215,29 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 }
 #resetBtn:hover{ background:#663333; color:#fff; }
 
-#skinGrid{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:10px; }
-@media(max-width:600px){ #skinGrid{ grid-template-columns:repeat(4,1fr);} }
+#skinPreviewBig{
+  display:flex; flex-direction:column; align-items:center; gap:8px; margin:0 auto 16px; padding:16px 0 14px;
+  max-width:360px; border:1px solid var(--border); border-radius:12px; background:var(--card);
+}
+#skinPreviewBigCanvas{ width:110px; height:138px; }
+#skinPreviewBigName{ font-size:14px; font-weight:bold; color:var(--gold); letter-spacing:.5px; text-align:center; }
+#skinGrid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:0 auto 10px; max-width:360px; }
 .skinTile{
-  border:1px solid var(--border); background:var(--card); padding:12px 4px; text-align:center; cursor:pointer; border-radius:8px; transition:.2s;
+  border:1px solid var(--border); background:var(--card); padding:8px 2px; text-align:center; cursor:pointer; border-radius:8px; transition:.2s;
 }
 .skinTile:hover{ border-color:#666; transform:translateY(-2px); }
 .skinTile.equipped{ border-color:var(--gold); background:rgba(255,215,0,.07); }
 .skinTile.locked{ opacity:.6; }
-.skinTile .swatch{
-  width:34px; height:34px; border-radius:50%; margin:0 auto 6px; border:2px solid rgba(255,255,255,.25);
-  box-shadow:0 0 10px rgba(0,0,0,.5);
-}
-.skinTile .skinName{ font-size:11px; color:#ccc; line-height:1.3; }
-.skinTile .skinSub{ font-size:9px; color:#888; margin-top:2px; }
+.skinTile canvas.charPreview{ display:block; width:34px; height:42px; margin:0 auto 5px; }
+.skinTile .skinName{ font-size:10px; color:#ccc; line-height:1.3; }
+.skinTile .skinSub{ font-size:8px; color:#888; margin-top:2px; }
 .skinTile.equipped .skinSub{ color:var(--gold); }
+#skinPager{ display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:14px; }
+#skinPager button{ background:var(--card); border:1px solid var(--border); color:#ddd; width:34px; height:34px;
+  border-radius:6px; cursor:pointer; font-size:14px; font-weight:bold; transition:.2s; }
+#skinPager button:hover:not(:disabled){ border-color:var(--accent); color:var(--accent); }
+#skinPager button:disabled{ opacity:.35; cursor:not-allowed; }
+#skinPageInd{ font-size:13px; color:#999; min-width:70px; text-align:center; }
 
 /* Settings */
 .setting-row { display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:14px; margin-bottom:8px; border-radius:6px; border:1px solid var(--border); }
@@ -184,15 +245,19 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 .toggle.on { background:var(--accent); }
 .toggle::after { content:''; position:absolute; width:18px; height:18px; background:white; border-radius:50%; top:3px; left:3px; transition:.3s; }
 .toggle.on::after { left:25px; }
+#volumeRow{ display:none; flex-direction:column; align-items:stretch; gap:8px; }
+#volumeRow.show{ display:flex; }
+#volumeRow .volTop{ display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--text-dim); }
+#volumeSlider{ width:100%; accent-color:var(--accent); cursor:pointer; }
 
 /* Daily Reward */
-.daily-grid { display:flex; gap:12px; justify-content:center; margin:20px 0; }
-.daily-box { width:100px; padding:20px 10px; border:2px solid var(--border); border-radius:10px; text-align:center; background:var(--card); transition:.2s; }
+.daily-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px auto; max-width:380px; }
+.daily-box { padding:14px 6px; border:2px solid var(--border); border-radius:10px; text-align:center; background:var(--card); transition:.2s; }
 .daily-box.active { border-color:var(--gold); box-shadow:0 0 15px rgba(255,215,0,.3); animation:pulse 1.5s infinite; }
 .daily-box.claimed { opacity:0.4; border-style:dashed; }
 @keyframes pulse { 0%{transform:scale(1);} 50%{transform:scale(1.03);} 100%{transform:scale(1);} }
-.daily-box .day { font-size:12px; color:var(--text-dim); margin-bottom:8px; }
-.daily-box .reward { font-size:16px; color:var(--gold); font-weight:bold; }
+.daily-box .day { font-size:11px; color:var(--text-dim); margin-bottom:6px; }
+.daily-box .reward { font-size:14px; color:var(--gold); font-weight:bold; }
 
 /* Stats */
 .stat-card { background:var(--card); margin-bottom:8px; padding:16px; border-radius:6px; border:1px solid var(--border); text-align:left; display:flex; justify-content:space-between; align-items:center; }
@@ -294,6 +359,13 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 </head>
 <body>
 
+<!-- ================= FORCE LANDSCAPE OVERLAY ================= -->
+<div id="rotateOverlay">
+  <div class="icon">📱</div>
+  <div class="msg">Vui lòng xoay ngang thiết bị</div>
+  <div class="sub">Game chơi tốt nhất ở chế độ ngang màn hình</div>
+</div>
+
 <!-- ================= MENU ================= -->
 <div id="menuScreen">
   <div id="menuInner">
@@ -333,6 +405,11 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
       <button id="modeBackLink">◀ Chọn chế độ khác</button>
       <button id="continueBtn">▶ Chơi Tiếp</button>
       <div id="levelGrid"></div>
+      <div id="levelPager">
+        <button id="levelPrevBtn">◀</button>
+        <span id="levelPageInd">Trang 1/5</span>
+        <button id="levelNextBtn">▶</button>
+      </div>
       <div class="footNote">Tiến trình, vàng và trang phục được lưu tự động.</div>
       <button id="resetBtn">XÓA TIẾN TRÌNH</button>
     </div>
@@ -373,7 +450,16 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
     </div>
 
     <div id="skinsTab" class="tab-content">
+      <div id="skinPreviewBig">
+        <canvas id="skinPreviewBigCanvas" width="200" height="250"></canvas>
+        <div id="skinPreviewBigName">Trắng</div>
+      </div>
       <div id="skinGrid"></div>
+      <div id="skinPager">
+        <button id="skinPrevBtn">◀</button>
+        <span id="skinPageInd">Trang 1/6</span>
+        <button id="skinNextBtn">▶</button>
+      </div>
       <div class="footNote">Mua trang phục bằng vàng. Thắng mỗi 5 cấp sẽ tặng 1 trang phục đặc biệt.</div>
     </div>
 
@@ -393,14 +479,19 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 
     <div id="settingsTab" class="tab-content">
       <div class="setting-row"><span>Âm thanh</span><div class="toggle on" id="toggleSound" onclick="toggleSetting(this, 'sound')"></div></div>
-      <div class="setting-row"><span>Camera Shake</span><div class="toggle on" id="toggleShake" onclick="toggleSetting(this, 'shake')"></div></div>
-      <div class="setting-row"><span>Particle</span><div class="toggle on" id="toggleParticle" onclick="toggleSetting(this, 'particle')"></div></div>
-      <div class="setting-row"><span>Glow</span><div class="toggle on" id="toggleGlow" onclick="toggleSetting(this, 'glow')"></div></div>
-      <div class="setting-row"><span>Trail</span><div class="toggle on" id="toggleTrail" onclick="toggleSetting(this, 'trail')"></div></div>
+      <div class="setting-row" id="volumeRow">
+        <div class="volTop"><span>Âm lượng</span></div>
+        <input type="range" id="volumeSlider" min="0" max="100" value="100">
+      </div>
+      <div class="setting-row"><span>Hiệu ứng rung</span><div class="toggle on" id="toggleShake" onclick="toggleSetting(this, 'shake')"></div></div>
+      <div class="setting-row"><span>Hiệu ứng thông thường</span><div class="toggle on" id="toggleParticle" onclick="toggleSetting(this, 'particle')"></div></div>
+      <div class="setting-row"><span>Hiệu ứng ánh sáng</span><div class="toggle on" id="toggleGlow" onclick="toggleSetting(this, 'glow')"></div></div>
+      <div class="setting-row"><span>Hiệu ứng chuyển động</span><div class="toggle on" id="toggleTrail" onclick="toggleSetting(this, 'trail')"></div></div>
     </div>
   </div>
 </div>
 <div id="menuToast"></div>
+<div id="fadeOverlay"></div>
 
 <!-- ================= HOME SCREEN ================= -->
 <div id="homeScreen">
@@ -415,6 +506,7 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
     <div id="homeMenuGrid">
       <button class="homeCard" id="skinsCard"><span class="icon">👕</span><span>TRANG PHỤC</span></button>
       <button class="homeCard" id="dailyCard"><span class="icon">🎁</span><span>THƯỞNG HẰNG NGÀY</span></button>
+      <button class="homeCard" id="statsCard"><span class="icon">📊</span><span>THỐNG KÊ</span></button>
       <button class="homeCard" id="infoCard"><span class="icon">ℹ️</span><span>THÔNG TIN</span></button>
     </div>
   </div>
@@ -502,7 +594,7 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 <div id="gameWrap" style="display:none;">
 <canvas id="game"></canvas>
 <div id="hud">
-<div class="row"><button id="backBtn">⏸ PAUSE</button></div>
+<div class="row"><button id="backBtn">⏸ PAUSE</button><button id="fsBtn" title="Toàn màn hình">⛶</button></div>
 <div><span class="lbl">CẤP</span> <span class="val" id="lvlTag">1</span></div>
 <div><span class="lbl">CHẾT (LƯỢT NÀY)</span> <span class="val" id="dCnt">0</span></div>
 <div id="attRow"><span class="lbl">LẦN THỬ</span> <span class="val" id="attTag">0</span></div>
@@ -521,7 +613,6 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
         <div class="t-btn" id="btn-right">►</div>
     </div>
     <div class="t-group">
-        <div class="t-btn" id="btn-respawn">HỒI<br>SINH</div>
         <div class="t-btn" id="btn-jump">NHẢY</div>
     </div>
 </div>
@@ -611,31 +702,99 @@ function dev_resetSave(){ document.getElementById('resetBtn').click(); }
 function dev_finishLevel(){ if(gameActive && funMode!=='endless') showWin(); }
 function dev_teleport(){ if(gameActive){ let x=prompt('X:', p.x); let y=prompt('Y:', p.y); if(x!==null && y!==null){ p.x=parseFloat(x); p.y=parseFloat(y); p.vx=0; p.vy=0; } } }
 
-/* ============== STORAGE ============== */
-const LS_KEY = 'vodinh_progress_v3'; 
+/* ============== STORAGE (IndexedDB, fallback localStorage) ============== */
+const LS_KEY = 'vodinh_progress_v3';
+const IDB_NAME = 'vodinh_db';
+const IDB_STORE = 'progress';
+const IDB_KEY = 'main';
 let progress = null;
+let idbDb = null;
+
+function openIDB(){
+  return new Promise((resolve)=>{
+    if(!window.indexedDB){ resolve(null); return; }
+    try{
+      const req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = ()=>{
+        const db = req.result;
+        if(!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
+      };
+      req.onsuccess = ()=> resolve(req.result);
+      req.onerror = ()=> resolve(null);
+    }catch(e){ resolve(null); }
+  });
+}
+function idbGet(db, key){
+  return new Promise((resolve)=>{
+    try{
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get(key);
+      req.onsuccess = ()=> resolve(req.result ?? null);
+      req.onerror = ()=> resolve(null);
+    }catch(e){ resolve(null); }
+  });
+}
+function idbSet(db, key, value){
+  return new Promise((resolve)=>{
+    try{
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(value, key);
+      tx.oncomplete = ()=> resolve(true);
+      tx.onerror = ()=> resolve(false);
+    }catch(e){ resolve(false); }
+  });
+}
 
 async function loadProgress(){
-  try{
-    const raw = localStorage.getItem(LS_KEY);
-    if(raw) progress = JSON.parse(raw);
-  }catch(e){}
+  idbDb = await openIDB();
+  progress = null;
+
+  // 1) Ưu tiên đọc từ IndexedDB
+  if(idbDb){
+    try{ progress = await idbGet(idbDb, IDB_KEY); }catch(e){}
+  }
+
+  // 2) Chưa có trong IDB (máy cũ vẫn dùng localStorage, hoặc lần đầu nâng cấp)
+  //    -> di trú dữ liệu cũ từ localStorage sang IndexedDB một lần.
+  if(!progress){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(raw) progress = JSON.parse(raw);
+    }catch(e){}
+    if(progress && idbDb){
+      idbSet(idbDb, IDB_KEY, progress);
+    }
+  }
+
   if(!progress) progress = { unlocked:1, completed:{}, attempts:{}, gold:0, owned:[], equipped:0 };
   if(!progress.owned) progress.owned = [];
   if(typeof progress.gold !== 'number') progress.gold = 0;
   if(typeof progress.equipped !== 'number') progress.equipped = 0;
-  if(!progress.settings) progress.settings = { sound: true, shake: true, particle: true, glow: true, trail: true };
+  if(!progress.settings) progress.settings = { sound: true, shake: true, particle: true, glow: true, trail: true, volume: 100 };
+  if(typeof progress.settings.volume !== 'number') progress.settings.volume = 100;
   if(!progress.stats) progress.stats = { totalPlays: 0, totalDeaths: 0, playTimeSec: 0, hardestLevel: 0, bestEndlessFlags: 0 };
   if(typeof progress.stats.bestEndlessFlags !== 'number') progress.stats.bestEndlessFlags = 0;
   if(!progress.daily) progress.daily = { lastClaim: null, streak: 0 };
 }
 
 let saveTimer=null;
+let savePendingResolvers=[];
 function saveProgress(){
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{
-    try{ localStorage.setItem(LS_KEY, JSON.stringify(progress)); }catch(e){ console.error('save failed', e); }
-  }, 250);
+  return new Promise((resolve)=>{
+    savePendingResolvers.push(resolve);
+    saveTimer=setTimeout(async ()=>{
+      let saved = false;
+      if(idbDb){ saved = await idbSet(idbDb, IDB_KEY, progress); }
+      if(!saved){
+        // Fallback nếu trình duyệt không hỗ trợ IndexedDB hoặc ghi thất bại
+        try{ localStorage.setItem(LS_KEY, JSON.stringify(progress)); }catch(e){ console.error('save failed', e); }
+      }
+      const resolvers = savePendingResolvers;
+      savePendingResolvers = [];
+      resolvers.forEach(r=>r());
+    }, 250);
+  });
 }
 
 /* ============== SOUND ============== */
@@ -647,10 +806,12 @@ function ensureAudio(){
 function beep(freq,dur,type,vol,slideTo){
   if(!actx || !progress.settings.sound) return;
   try{
+    const volMult = (typeof progress.settings.volume==='number' ? progress.settings.volume : 100)/100;
+    if(volMult<=0) return;
     const o=actx.createOscillator(), g=actx.createGain();
     o.type=type||'sine'; o.frequency.value=freq;
     if(slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(20,slideTo), actx.currentTime+dur);
-    g.gain.value=vol||0.12;
+    g.gain.value=(vol||0.12)*volMult;
     g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+dur);
     o.connect(g); g.connect(actx.destination);
     o.start(); o.stop(actx.currentTime+dur);
@@ -664,6 +825,10 @@ function sndClick(){ beep(320,0.05,'square',0.05); }
 function sndDenied(){ beep(160,0.15,'square',0.08,90); }
 function sndUnlock(){ beep(660,0.1,'sine',0.11,990); setTimeout(()=>beep(990,0.18,'sine',0.11,1320),100); }
 function sndReveal(){ beep(300,0.15,'sine',0.1,900); setTimeout(()=>beep(900,0.2,'sine',0.1,1400),130); }
+function sndStep(){ beep(140+Math.random()*30,0.045,'square',0.028,95); }
+function sndArrow(){ beep(520,0.045,'triangle',0.035,260); }
+function sndTrapFall(){ beep(220,0.09,'square',0.05,120); }
+function sndTrapLand(){ beep(85,0.14,'sawtooth',0.09,45); }
 
 /* ============== SKINS ============== */
 const SKINS = [{id:0, name:'Trắng', price:0, type:'default', color:'#ffffff'}];
@@ -683,10 +848,8 @@ const MILESTONE_SKINS = [
 ];
 SKINS.push(...MILESTONE_SKINS);
 function getSkin(id){ return SKINS.find(s=>s.id===id) || SKINS[0]; }
-function getPlayerFillStyle(){
-  const skin = getSkin(progress.equipped);
+function getSkinFillStyle(skin, t){
   if(skin.type!=='milestone') return skin.color;
-  const t = Date.now()*0.002;
   switch(skin.special){
     case 'fire': return `hsl(${20+Math.sin(t)*15},100%,55%)`;
     case 'ice': return `hsl(${190+Math.sin(t)*10},80%,75%)`;
@@ -697,13 +860,17 @@ function getPlayerFillStyle(){
     default: return '#ffffff';
   }
 }
+function getPlayerFillStyle(){
+  const skin = getSkin(progress.equipped);
+  return getSkinFillStyle(skin, Date.now()*0.002);
+}
 
 const cv=document.getElementById('game'),cx=cv.getContext('2d');
 let W,H;function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight}resize();addEventListener('resize',resize);
 const keys={};
 addEventListener('keydown',e=>{
   keys[e.code]=true;
-  if(e.code==='KeyR')respawn();
+  if(e.code==='KeyR' && !fadeBusy) fadeToBlack(()=>respawn(), {fadeOut:140, hold:50, fadeIn:180});
   if(e.code==='Escape')pauseGame();
   if(['Space','ArrowUp','ArrowLeft','ArrowRight','ArrowDown'].includes(e.code))e.preventDefault();
 });
@@ -711,7 +878,11 @@ addEventListener('keyup',e=>keys[e.code]=false);
 
 function bindTouchBtn(id, keyCode) {
     const el = document.getElementById(id);
-    const press = (e) => { e.preventDefault(); keys[keyCode] = true; el.classList.add('active'); };
+    const press = (e) => {
+        e.preventDefault(); keys[keyCode] = true; el.classList.add('active');
+        el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+        if(navigator.vibrate) navigator.vibrate(12);
+    };
     const release = (e) => { e.preventDefault(); keys[keyCode] = false; el.classList.remove('active'); };
     el.addEventListener('touchstart', press, { passive: false });
     el.addEventListener('touchend', release, { passive: false });
@@ -723,8 +894,6 @@ function bindTouchBtn(id, keyCode) {
 bindTouchBtn('btn-left', 'ArrowLeft');
 bindTouchBtn('btn-right', 'ArrowRight');
 bindTouchBtn('btn-jump', 'Space');
-document.getElementById('btn-respawn').addEventListener('touchstart', (e)=>{e.preventDefault();respawn();}, {passive:false});
-document.getElementById('btn-respawn').addEventListener('mousedown', (e)=>{e.preventDefault();respawn();});
 
 /* Constants */
 const G=0.59,JUMP=-12.6,SPD=0.63,MAXSPD=4.4,FRIC=0.85,COYOTE=6,JBUF=6;
@@ -733,13 +902,19 @@ let WORLD_W=900;
 
 /* State */
 let curLevelNum=1, gameActive=false, isPaused=false;
+let curLevelTheme=null; // theme "signature" của màn hiện tại (null = màn thường)
 let funMode=null, funSpeedMult=1, funLevelBaseline=30; // funMode: null | 'time' | 'speed'
 let deaths=0,startTime=Date.now(),realFlagVis=false,fakeTouched=false,won=false;
 let shake=0,flashFx=0,particles=[],postReveal=false,lavaY=WORLD_H+50,msgT=0,msgMain='',msgSub='';
 
-const p={x:100,y:400,vx:0,vy:0,w:24,h:34,onG:false,alive:true,face:1,coyote:0,jbuf:0,trail:[],walkA:0,deathT:0,squashX:1,squashY:1};
+const p={x:100,y:400,vx:0,vy:0,w:24,h:34,onG:false,alive:true,face:1,coyote:0,jbuf:0,trail:[],walkA:0,stepIdx:0,deathT:0,squashX:1,squashY:1};
 const SPAWN={x:100,y:400};
 let cam={x:0,y:0};
+let camLookAhead=0; // giá trị look-ahead ngang hiện tại, được làm mượt riêng để không giật khi đổi hướng
+const CAM_LOOKAHEAD_PX = 100;   // camera lệch trước theo hướng nhìn bao nhiêu px
+const CAM_LOOKAHEAD_SPEED = 0.04; // tốc độ làm mượt look-ahead (chậm hơn cam.lerp để tránh giật khi quay đầu liên tục)
+const CAM_DEADZONE_W = 160; // vùng an toàn ngang quanh tâm màn hình - trong vùng này camera đứng yên
+const CAM_DEADZONE_H = 110; // vùng an toàn dọc quanh tâm màn hình
 
 const plats=[], traps=[];
 let flagSpots=[], realFlag=null, fakeFlag=null;
@@ -748,6 +923,7 @@ let flagSpots=[], realFlag=null, fakeFlag=null;
 let endlessFlags=[], endlessFlagCount=0, endlessRng=null, endlessX=0, endlessPendingSway=0, endlessBgX=0;
 const ENDLESS_LOOKAHEAD = 2600; // sinh thêm map khi người chơi còn cách rìa bấy nhiêu px
 const ENDLESS_TRIM_BEHIND = 3000; // dọn dẹp object đã ở lại phía sau bấy nhiêu px để đỡ tốn bộ nhớ
+const ENDLESS_VOID_Y = GY + 120; // rớt quá mặt đất bấy nhiêu px trong endless -> coi như rơi vực, chết ngay (phản xạ nhanh, không đợi rơi hết map)
 
 function P(x,y,w,h,type,opts){
 plats.push({x,y,w,h,type:type||'static',sx:x,sy:y,
@@ -779,14 +955,42 @@ function mulberry32(seed){
 }
 
 /* ============== LEVEL GENERATOR ============== */
+/* ============== SIGNATURE LEVELS (đa dạng nhịp chơi) ==============
+   Cứ mỗi SIGNATURE_INTERVAL màn lại có 1 màn "chủ đề riêng": thay vì bẫy
+   trộn lẫn tăng dần đều (dễ nhàm sau nhiều màn), màn signature dồn hẳn vào
+   MỘT loại thử thách (toàn cưa máy, toàn đảo bay...) để tạo nhịp chơi khác
+   biệt. Vẫn tuân thủ đúng mô hình an toàn nhảy (gap 100-125px) như màn thường,
+   chỉ đổi loại/tỉ lệ bẫy và tỉ lệ đảo bay. */
+const SIGNATURE_INTERVAL = 6;
+const SIGNATURE_THEMES = [
+  {id:'spike',    name:'Rừng Gai',    minN:1,  hazards:['spike']},
+  {id:'saw',      name:'Cưa Máy',     minN:5,  hazards:['saw']},
+  {id:'sky',      name:'Đảo Bay',     minN:8,  sky:true},
+  {id:'arrow',    name:'Mưa Tên',     minN:10, hazards:['arrow']},
+  {id:'crusher',  name:'Nhà Máy Ép',  minN:20, hazards:['crusher']},
+  {id:'pendulum', name:'Rừng Con Lắc',minN:25, hazards:['pendulum']},
+];
+function getLevelTheme(n){
+  if(n % SIGNATURE_INTERVAL !== 0) return null;
+  const eligible = SIGNATURE_THEMES.filter(t => n >= t.minN);
+  if(eligible.length===0) return null;
+  // Xoay vòng qua các theme đã mở khoá -> càng chơi xa càng nhiều kiểu signature khác nhau
+  const idx = Math.floor(n / SIGNATURE_INTERVAL) - 1;
+  return eligible[((idx % eligible.length) + eligible.length) % eligible.length];
+}
+
 function buildLevel(n, seedOverride){
   plats.length=0; traps.length=0; flagSpots=[];
   const rng = mulberry32(typeof seedOverride==='number' ? seedOverride : (n*7919+13));
 
   const sections   = Math.min(12, 4 + Math.round(n*0.25)); 
-  const trapChance = Math.min(0.35, 0.05 + n*0.008); 
+  let trapChance = Math.min(0.35, 0.05 + n*0.008); 
   const fadeChance  = Math.min(0.15, 0.004*n);
   const moveChance  = Math.min(0.15, 0.008*n);
+  let floatChance = 0.3; // tỉ lệ sinh viên đá bay phụ mỗi đoạn (mặc định)
+
+  const theme = seedOverride===undefined ? getLevelTheme(n) : null; // chỉ áp signature cho màn theo lộ trình, không áp cho random map
+  curLevelTheme = theme;
 
   // ---- JUMP-SAFETY MODEL ----
   // Simulated horizontal distance the player can cover during one jump
@@ -811,6 +1015,19 @@ function buildLevel(n, seedOverride){
   if(n>=15) hazardPool.push('fallblock');
   if(n>=20) hazardPool.push('crusher');
   if(n>=25) hazardPool.push('pendulum');
+
+  let themedHazardPool = hazardPool;
+  if(theme){
+    if(theme.sky){
+      // Đảo Bay: gần như không có bẫy mặt đất, tập trung platforming trên các viên đá bay
+      floatChance = 0.75;
+      trapChance = Math.min(trapChance, 0.12);
+    } else if(theme.hazards){
+      // Dồn hẳn 1 loại bẫy, tỉ lệ dày hơn hẳn màn thường để tạo cảm giác "gauntlet"
+      themedHazardPool = theme.hazards;
+      trapChance = Math.max(trapChance, 0.6);
+    }
+  }
 
   let x=0;
   P(0,GY,420,42);
@@ -849,7 +1066,7 @@ function buildLevel(n, seedOverride){
     if(!placed) P(nx,GY,w,42);
     groundStones.push({x:nx+w/2,y:GY});
 
-    if(rng()<0.3){ 
+    if(rng()<floatChance){ 
       // Max jump height is ~134px (JUMP^2/(2*G)); keep offset well under that (55-110)
       // so the stone is always reachable, but high enough to never touch/overlap the ground.
       const by = GY-(55+Math.round(rng()*55)); 
@@ -860,7 +1077,7 @@ function buildLevel(n, seedOverride){
     }
 
     if(rng()<trapChance){
-      const type = hazardPool[Math.floor(rng()*hazardPool.length)];
+      const type = themedHazardPool[Math.floor(rng()*themedHazardPool.length)];
       const midx = x+gap*0.5;
       
       if(type==='spike'){
@@ -1059,7 +1276,7 @@ function startEndlessLevel(){
   deaths=0; startTime=Date.now(); realFlagVis=false; fakeTouched=false; won=false;
   shake=0; flashFx=0; particles=[]; postReveal=false; lavaY=WORLD_H+50; msgT=0;
   p.x=SPAWN.x; p.y=SPAWN.y; p.vx=0; p.vy=0; p.onG=false; p.alive=true; p.trail=[]; p.deathT=0; p.squashX=1; p.squashY=1;
-  cam.x=0; cam.y=0;
+  cam.x=0; cam.y=0; camLookAhead=0;
 
   document.getElementById('dCnt').textContent='0';
   document.getElementById('lvlTag').textContent='♾ KHÔNG GIỚI HẠN';
@@ -1172,7 +1389,7 @@ function startLevel(n){
   deaths=0; startTime=Date.now(); realFlagVis=false; fakeTouched=false; won=false;
   shake=0; flashFx=0; particles=[]; postReveal=false; lavaY=WORLD_H+50; msgT=0;
   p.x=SPAWN.x; p.y=SPAWN.y; p.vx=0; p.vy=0; p.onG=false; p.alive=true; p.trail=[]; p.deathT=0; p.squashX=1; p.squashY=1;
-  cam.x=0; cam.y=0;
+  cam.x=0; cam.y=0; camLookAhead=0;
 
   document.getElementById('dCnt').textContent='0';
   document.getElementById('lvlTag').textContent=n;
@@ -1180,6 +1397,9 @@ function startLevel(n){
   setHudEndlessMode(false);
   document.getElementById('win').style.display='none';
   hideMsg();
+  if(curLevelTheme){
+    showMsg('★ MÀN ĐẶC BIỆT ★', curLevelTheme.name);
+  }
 
   document.getElementById('menuScreen').style.display='none';
   document.getElementById('pauseModal').classList.remove('show');
@@ -1221,7 +1441,7 @@ function startFunLevel(mode, speedMult){
   deaths=0; startTime=Date.now(); realFlagVis=false; fakeTouched=false; won=false;
   shake=0; flashFx=0; particles=[]; postReveal=false; lavaY=WORLD_H+50; msgT=0;
   p.x=SPAWN.x; p.y=SPAWN.y; p.vx=0; p.vy=0; p.onG=false; p.alive=true; p.trail=[]; p.deathT=0; p.squashX=1; p.squashY=1;
-  cam.x=0; cam.y=0;
+  cam.x=0; cam.y=0; camLookAhead=0;
 
   document.getElementById('dCnt').textContent='0';
   document.getElementById('lvlTag').textContent = mode==='speed' ? ('⚡ x'+funSpeedMult) : '⏱ Ngẫu Nhiên';
@@ -1303,10 +1523,11 @@ function resumeGame() {
 function restartGame() {
   document.getElementById('pauseModal').classList.remove('show');
   isPaused = false;
-  if(funMode==='time'){ startFunLevel('time'); return; }
-  if(funMode==='speed'){ startFunLevel('speed', funSpeedMult); return; }
-  if(funMode==='endless'){ startEndlessLevel(); return; }
-  startLevel(curLevelNum);
+  if(fadeBusy) return;
+  if(funMode==='time'){ fadeToBlack(()=>startFunLevel('time')); return; }
+  if(funMode==='speed'){ fadeToBlack(()=>startFunLevel('speed', funSpeedMult)); return; }
+  if(funMode==='endless'){ fadeToBlack(()=>startEndlessLevel()); return; }
+  fadeToBlack(()=>startLevel(curLevelNum));
 }
 function quitToMenu() {
   document.getElementById('pauseModal').classList.remove('show');
@@ -1338,11 +1559,66 @@ function backToMenu(){
 }
 document.getElementById('backBtn').addEventListener('click', pauseGame);
 
+/* ============== FULLSCREEN ============== */
+function isFullscreen(){
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+}
+function enterFullscreen(){
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+  if(req) req.call(el).catch(()=>{});
+}
+function exitFullscreen(){
+  const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+  if(exit) exit.call(document).catch?.(()=>{});
+}
+function toggleFullscreen(){
+  ensureAudio(); sndClick();
+  if(isFullscreen()) exitFullscreen(); else enterFullscreen();
+}
+function updateFsBtn(){
+  const btn = document.getElementById('fsBtn');
+  if(btn) btn.textContent = isFullscreen() ? '⤢' : '⛶';
+}
+document.getElementById('fsBtn').addEventListener('click', toggleFullscreen);
+['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(ev=>{
+  document.addEventListener(ev, updateFsBtn);
+});
+
+/* ============== FORCE LANDSCAPE ============== */
+// 1) Thử khoá xoay ngang bằng Screen Orientation API (chỉ Android/Chrome hỗ trợ,
+//    thường cần đang ở chế độ fullscreen mới có tác dụng). iOS Safari không hỗ
+//    trợ API này -> luôn thất bại, bỏ qua lỗi là bình thường, không phải bug.
+function tryLockLandscape(){
+  try{
+    const so = screen.orientation;
+    if(so && so.lock) so.lock('landscape').catch(()=>{});
+  }catch(e){}
+}
+// Thử khoá ngay khi tải trang, và thử lại mỗi khi vào fullscreen (dễ thành công hơn)
+tryLockLandscape();
+document.addEventListener('fullscreenchange', tryLockLandscape);
+document.addEventListener('webkitfullscreenchange', tryLockLandscape);
+
+// 2) Chốt chặn phổ quát cho MỌI thiết bị/trình duyệt (kể cả iOS Safari không có
+//    API khoá xoay thật): khi màn hình đang ở chế độ dọc trên thiết bị cảm ứng,
+//    hiện overlay yêu cầu xoay ngang và tạm dừng hẳn vòng lặp game (không chết
+//    oan, không trôi giờ) cho tới khi người chơi xoay lại máy.
+let isPortraitBlocked = false;
+function updatePortraitBlock(){
+  const mq = window.matchMedia('(orientation: portrait) and (pointer: coarse)');
+  isPortraitBlocked = mq.matches;
+}
+updatePortraitBlock();
+window.matchMedia('(orientation: portrait) and (pointer: coarse)').addEventListener?.('change', updatePortraitBlock);
+addEventListener('resize', updatePortraitBlock);
+addEventListener('orientationchange', updatePortraitBlock);
+
 function updateP(){
 if(!p.alive){
   p.deathT++;
-  if(p.deathT>40){
-    if(funMode==='endless'){ endEndlessRun(); } else { respawn(); }
+  if(p.deathT>40 && !fadeBusy){
+    if(funMode==='endless'){ endEndlessRun(); } else { fadeToBlack(()=>respawn(), {fadeOut:140, hold:50, fadeIn:180}); }
   }
   return
 }
@@ -1367,6 +1643,15 @@ if(progress.settings.trail && (Math.abs(p.vx)>1||Math.abs(p.vy)>1)){p.trail.push
 if(p.trail.length>12)p.trail.shift();
 for(let i=p.trail.length-1;i>=0;i--){p.trail[i].life--;if(p.trail[i].life<=0)p.trail.splice(i,1)}
 p.walkA+=Math.abs(p.vx)*0.2;
+// Âm thanh bước chân: đồng bộ theo nửa chu kỳ dáng đi (walkA), chỉ phát khi
+// nhân vật đang đứng trên mặt đất và di chuyển đủ nhanh để tránh spam khi đứng yên
+{
+  const stepIdx = Math.floor(p.walkA / Math.PI);
+  if(stepIdx !== p.stepIdx){
+    p.stepIdx = stepIdx;
+    if(p.onG && Math.abs(p.vx)>1.2) sndStep();
+  }
+}
 p.squashX+=(1-p.squashX)*0.22; p.squashY+=(1-p.squashY)*0.22;
 
 p.x+=p.vx;
@@ -1485,8 +1770,14 @@ if(funMode!=='endless'){
   trimEndlessBehind();
 }
 
-if(p.y>WORLD_H+100){kill();return}
-if(postReveal && p.y+p.h>lavaY){kill();return}
+if(funMode==='endless'){
+  // Endless cần phản xạ nhanh: rớt quá mặt đất một chút là chết ngay,
+  // không đợi rơi hết xuống đáy map như các mode khác.
+  if(p.y > ENDLESS_VOID_Y){kill();return}
+} else {
+  if(p.y>WORLD_H+100){kill();return}
+  if(postReveal && p.y+p.h>lavaY){kill();return}
+}
 }
 
 function updatePlats(){
@@ -1519,6 +1810,7 @@ if(t.type==='arrow'){
 t.interval--;
 if(t.interval<=0){
 t.arrows.push({x:t.x,y:t.y,dir:t.dir,life:200});
+sndArrow();
 if(t.dir==='right')t.interval=110+Math.random()*40;
 else if(t.dir==='down')t.interval=85+Math.random()*30;
 else t.interval=100+Math.random()*40;
@@ -1539,16 +1831,16 @@ else if(t.type==='fallblock'){
 if(!t.fallen){
 if(Math.abs(p.x-t.trigX)<t.trigW/2){
 t.delay--;
-if(t.delay<=0){t.fallen=true;t.fallY=0;t.vy=0;t.delay=25}
+if(t.delay<=0){t.fallen=true;t.fallY=0;t.vy=0;t.delay=25;sndTrapFall();}
 }
 } else if(!t.landed){
 t.vy=(t.vy||0)+G;t.fallY+=t.vy;
 let br={x:t.x,y:t.y+t.fallY,w:t.w,h:t.h};
 for(const pl of plats){
 if(!pl.solid)continue;
-if(rI(br,pl)&&t.vy>0){t.fallY=pl.y-t.y-t.h;t.landed=true;t.respawn=180;break}
+if(rI(br,pl)&&t.vy>0){t.fallY=pl.y-t.y-t.h;t.landed=true;t.respawn=180;sndTrapLand();break}
 }
-if(t.y+t.fallY>GY+42){t.fallY=GY+42-t.y;t.landed=true;t.respawn=180}
+if(t.y+t.fallY>GY+42){t.fallY=GY+42-t.y;t.landed=true;t.respawn=180;sndTrapLand();}
 } else {
 t.respawn--;
 if(t.respawn<=0){t.fallen=false;t.landed=false;t.fallY=0;t.vy=0;t.delay=25}
@@ -1558,15 +1850,17 @@ if(t.respawn<=0){t.fallen=false;t.landed=false;t.fallY=0;t.vy=0;t.delay=25}
 }
 
 function updateLava(){
-// Giảm tốc độ dung nham xuống 0.2 để người chơi có thời gian chạy về đích
+// Tốc độ dung nham 0.2px/bước-logic (bước-logic đã được quy đổi theo Delta Time
+// trong loop(), nên tốc độ này giữ nguyên trên mọi màn hình 60/90/120/144Hz)
 if(postReveal && lavaY > 480){ lavaY -= 0.2; }
 }
 
 function kill(){
 if(dev.godMode) return; 
 if(!p.alive)return;
-p.alive=false;p.deathT=0;deaths++;shake=18;flashFx=1;
+p.alive=false;p.deathT=0;deaths++;shake=6;flashFx=1;
 sndDeath();
+if(navigator.vibrate) navigator.vibrate([40,30,40,30,120]);
 if(!funMode){
   progress.attempts[curLevelNum]=(progress.attempts[curLevelNum]||0)+1;
   updateAttTag();
@@ -1580,8 +1874,6 @@ if(progress.settings.particle){
     life:30+Math.random()*20,color:'#ff4444',size:3+Math.random()*4});
   }
 }
-let msg=deathMsgs[Math.floor(Math.random()*deathMsgs.length)];
-showMsg(msg,`Lần chết thứ ${deaths}...`);
 document.getElementById('dCnt').textContent=deaths;
 }
 
@@ -1638,10 +1930,11 @@ document.getElementById('winSt').innerHTML=
 document.getElementById('nextLvlBtn').style.display = curLevelNum>=TOTAL_LEVELS ? 'none' : 'inline-block';
 }
 document.getElementById('nextLvlBtn').addEventListener('click', ()=>{
-  if(funMode==='time'){ startFunLevel('time'); return; }
-  if(funMode==='speed'){ startFunLevel('speed', funSpeedMult); return; }
-  if(funMode==='endless'){ startEndlessLevel(); return; }
-  startLevel(Math.min(TOTAL_LEVELS,curLevelNum+1));
+  if(fadeBusy) return;
+  if(funMode==='time'){ fadeToBlack(()=>startFunLevel('time')); return; }
+  if(funMode==='speed'){ fadeToBlack(()=>startFunLevel('speed', funSpeedMult)); return; }
+  if(funMode==='endless'){ fadeToBlack(()=>startEndlessLevel()); return; }
+  fadeToBlack(()=>startLevel(Math.min(TOTAL_LEVELS,curLevelNum+1)));
 });
 document.getElementById('winMenuBtn').addEventListener('click', backToMenu);
 
@@ -1687,9 +1980,31 @@ function updateCam(){
     if(keys['KeyW']||keys['ArrowUp']) cam.y -= camSpd;
     if(keys['KeyS']||keys['ArrowDown']) cam.y += camSpd;
   } else {
-    let tx=p.x-W/2+p.w/2;
-    let ty=p.y-H/2+p.h/2;
-    tx=Math.max(0,Math.min(WORLD_W-W,tx));
+    // --- Look-ahead: làm mượt độ lệch theo hướng nhìn, để người chơi thấy trước
+    // chướng ngại vật sắp tới thay vì luôn đứng giữa màn hình. Làm mượt riêng
+    // (chậm hơn lerp camera chính) để không bị giật khi đổi hướng liên tục.
+    const lookTarget = p.face>0 ? CAM_LOOKAHEAD_PX : -CAM_LOOKAHEAD_PX;
+    camLookAhead += (lookTarget - camLookAhead) * CAM_LOOKAHEAD_SPEED;
+
+    // --- Deadzone: chỉ tính lại điểm camera cần bám tới khi nhân vật ra khỏi
+    // vùng an toàn ở giữa màn hình (theo toạ độ màn hình hiện tại), thay vì
+    // luôn ép nhân vật về chính giữa mỗi khung hình -> nhảy nhẹ giữa map sẽ
+    // không làm camera rung.
+    const px = p.x+p.w/2, py = p.y+p.h/2;
+    const screenX = px - cam.x, screenY = py - cam.y;
+    const centerX = W/2 + camLookAhead, centerY = H/2;
+
+    let tx = cam.x, ty = cam.y;
+    if(screenX > centerX + CAM_DEADZONE_W/2) tx = px - (centerX + CAM_DEADZONE_W/2);
+    else if(screenX < centerX - CAM_DEADZONE_W/2) tx = px - (centerX - CAM_DEADZONE_W/2);
+
+    if(screenY > centerY + CAM_DEADZONE_H/2) ty = py - (centerY + CAM_DEADZONE_H/2);
+    else if(screenY < centerY - CAM_DEADZONE_H/2) ty = py - (centerY - CAM_DEADZONE_H/2);
+
+    // Nếu map hẹp hơn màn hình (WORLD_W < W, thường gặp trên PC màn hình rộng),
+    // Math.min(WORLD_W-W, tx) sẽ cho ra số âm và kẹp cam.x lệch hẳn sang trái.
+    // Trường hợp này căn giữa map theo chiều ngang thay vì bám theo người chơi.
+    tx = (WORLD_W <= W) ? (WORLD_W - W) / 2 : Math.max(0, Math.min(WORLD_W - W, tx));
     ty=Math.max(-100,Math.min(WORLD_H-H,ty));
     cam.x+=(tx-cam.x)*0.1;
     cam.y+=(ty-cam.y)*0.1;
@@ -1923,12 +2238,15 @@ if(funMode!=='endless'){
 }
 
 if(progress.settings.trail){
+let trailColor=getPlayerFillStyle();
 for(let i=0;i<p.trail.length;i++){
 let tr=p.trail[i];
 let a=tr.life/15*0.3;
-cx.fillStyle=`rgba(150,200,255,${a})`;
+cx.globalAlpha=a;
+cx.fillStyle=trailColor;
 cx.beginPath();cx.arc(tr.x,tr.y,4+ i*0.3,0,6.28);cx.fill();
 }
+cx.globalAlpha=1;
 }
 
 if(p.alive){
@@ -2061,9 +2379,20 @@ if(msgT>0){msgT--;if(msgT<=0)hideMsg()}
 }
 
 let timeAcc = 0;
+let lastFrameTime = performance.now();
 function loop(){
-  if(gameActive){
-    timeAcc += dev.timeScale;
+  const now = performance.now();
+  // Delta Time thực tế giữa 2 khung hình (ms). Toàn bộ logic game (di chuyển, bẫy,
+  // dung nham...) được viết theo "bước" giả định 60 bước/giây, nên ta quy đổi dt thực
+  // sang số bước tương đương 60fps -> tốc độ game giữ nguyên dù màn hình 60/90/120/144Hz.
+  let frameDt = now - lastFrameTime;
+  lastFrameTime = now;
+  if(frameDt < 0) frameDt = 0;
+  if(frameDt > 250) frameDt = 250; // clamp khi tab bị ẩn/treo lâu rồi quay lại, tránh dồn quá nhiều bước
+
+  if(gameActive && !isPortraitBlocked){
+    timeAcc += (frameDt / (1000/60)) * dev.timeScale;
+    if(timeAcc > 5) timeAcc = 5; // chặn "spiral of death" nếu máy giật/lag nặng
     while(timeAcc >= 1) {
       updatePlats();
       updateP();
@@ -2077,9 +2406,9 @@ function loop(){
     drawMinimap();
     updateUI();
   }
+  if(skinPreviewBigCtx || skinPreviewTiles.length) animateSkinPreviews();
   
   frameCount++;
-  let now = performance.now();
   if(now - lastFpsUpdate >= 1000) {
     fps = frameCount;
     frameCount = 0;
@@ -2089,34 +2418,67 @@ function loop(){
   requestAnimationFrame(loop);
 }
 
+/* ============== FADE TO BLACK TRANSITION ============== */
+let fadeBusy = false;
+function fadeToBlack(action, opts={}){
+  const overlay = document.getElementById('fadeOverlay');
+  if(!overlay){ action(); return; }
+  const fadeOutMs = opts.fadeOut ?? 220;
+  const fadeInMs  = opts.fadeIn  ?? 260;
+  const holdMs    = opts.hold    ?? 60;
+
+  fadeBusy = true;
+  overlay.style.transition = `opacity ${fadeOutMs}ms ease`;
+  // Buộc trình duyệt nhận trạng thái ban đầu trước khi bật hiệu ứng
+  overlay.classList.add('show');
+
+  setTimeout(()=>{
+    // Màn hình đang đen hoàn toàn -> đổi nội dung/màn hình ở đây
+    action();
+
+    setTimeout(()=>{
+      overlay.style.transition = `opacity ${fadeInMs}ms ease`;
+      requestAnimationFrame(()=>{
+        overlay.classList.remove('show');
+      });
+      setTimeout(()=>{ fadeBusy = false; }, fadeInMs);
+    }, holdMs);
+  }, fadeOutMs);
+}
+
 /* ============== HOME SCREEN LOGIC ============== */
 function goHome(){
-  document.getElementById('menuScreen').style.display='none';
-  document.getElementById('homeScreen').style.display='flex';
-  renderHome();
+  if(fadeBusy) return;
+  fadeToBlack(()=>{
+    document.getElementById('menuScreen').style.display='none';
+    document.getElementById('homeScreen').style.display='flex';
+    renderHome();
+  });
 }
 function openMenuTab(tabName){
+  if(fadeBusy) return;
   ensureAudio(); sndClick();
-  document.getElementById('homeScreen').style.display='none';
-  document.getElementById('menuScreen').style.display='flex';
+  fadeToBlack(()=>{
+    document.getElementById('homeScreen').style.display='none';
+    document.getElementById('menuScreen').style.display='flex';
 
-  if(tabName==='play'){
-    // Chơi ngay -> chỉ hiện màn chọn chế độ, ẩn thanh tab ngang
-    document.getElementById('tabs').style.display='none';
+    if(tabName==='play'){
+      // Chơi ngay -> chỉ hiện màn chọn chế độ, ẩn thanh tab ngang
+      document.getElementById('tabs').style.display='none';
+      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('show'));
+      document.getElementById('modeSelectTab').classList.add('show');
+      return;
+    }
+
+    // Các lối vào khác (skins/daily/stats/settings): mở thẳng vào mục đó, không hiện thanh tab
+    document.querySelectorAll('.tabBtn').forEach(b=>b.classList.remove('active'));
+    const btn = document.querySelector('.tabBtn[data-tab="'+tabName+'"]');
+    if(btn) btn.classList.add('active');
     document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('show'));
-    document.getElementById('modeSelectTab').classList.add('show');
-    return;
-  }
-
-  // Các lối vào khác (skins/daily/stats/settings): giữ nguyên thanh tab như cũ
-  document.getElementById('tabs').style.display='flex';
-  document.querySelectorAll('.tabBtn').forEach(b=>b.classList.remove('active'));
-  const btn = document.querySelector('.tabBtn[data-tab="'+tabName+'"]');
-  if(btn) btn.classList.add('active');
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('show'));
-  document.getElementById(tabName+'Tab').classList.add('show');
-  if(tabName==='skins') renderSkinGrid();
-  if(tabName==='stats') renderStats();
+    document.getElementById(tabName+'Tab').classList.add('show');
+    if(tabName==='skins') renderSkinGrid();
+    if(tabName==='stats') renderStats();
+  });
 }
 
 function showPlayModeSelect(){
@@ -2146,8 +2508,9 @@ function showFunChooser(){
   document.getElementById('funSpeedChooser').style.display='none';
 }
 document.getElementById('funTimeBtn').addEventListener('click', ()=>{
+  if(fadeBusy) return;
   ensureAudio(); sndClick();
-  startFunLevel('time');
+  fadeToBlack(()=>startFunLevel('time'));
 });
 document.getElementById('funSpeedBtn').addEventListener('click', ()=>{
   ensureAudio(); sndClick();
@@ -2159,14 +2522,16 @@ document.getElementById('funSpeedBackLink').addEventListener('click', ()=>{
   showFunChooser();
 });
 document.getElementById('funEndlessBtn').addEventListener('click', ()=>{
+  if(fadeBusy) return;
   ensureAudio(); sndClick();
-  startEndlessLevel();
+  fadeToBlack(()=>startEndlessLevel());
 });
 document.querySelectorAll('.speedBtn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
+    if(fadeBusy) return;
     ensureAudio(); sndClick();
     const mult = parseFloat(btn.dataset.speed);
-    startFunLevel('speed', mult);
+    fadeToBlack(()=>startFunLevel('speed', mult));
   });
 });
 function renderHome(){
@@ -2181,6 +2546,7 @@ function renderHome(){
 document.getElementById('playNowBtn').addEventListener('click', ()=>openMenuTab('play'));
 document.getElementById('skinsCard').addEventListener('click', ()=>openMenuTab('skins'));
 document.getElementById('dailyCard').addEventListener('click', ()=>openMenuTab('daily'));
+document.getElementById('statsCard').addEventListener('click', ()=>openMenuTab('stats'));
 document.getElementById('gearBtn').addEventListener('click', ()=>openMenuTab('settings'));
 document.getElementById('infoCard').addEventListener('click', ()=>{
   ensureAudio(); sndClick();
@@ -2197,20 +2563,39 @@ function renderMenu() {
   document.getElementById('goldVal').textContent = progress.gold;
 }
 
+const LEVELS_PER_PAGE = 20;
+const LEVEL_PAGES = Math.ceil(TOTAL_LEVELS/LEVELS_PER_PAGE);
+let levelPage = 1;
+let levelPageInit = false;
+
 function renderLevelGrid(){
+  if(!levelPageInit){
+    levelPage = Math.min(LEVEL_PAGES, Math.max(1, Math.ceil(progress.unlocked/LEVELS_PER_PAGE)));
+    levelPageInit = true;
+  }
   const grid=document.getElementById('levelGrid');
   grid.innerHTML='';
-  for(let i=1;i<=TOTAL_LEVELS;i++){
+  const start=(levelPage-1)*LEVELS_PER_PAGE+1;
+  const end=Math.min(TOTAL_LEVELS, levelPage*LEVELS_PER_PAGE);
+  for(let i=start;i<=end;i++){
     const locked=i>progress.unlocked;
     const completed=!!progress.completed[i];
     const tile=document.createElement('div');
     tile.className='lvlTile '+(locked?'locked':(completed?'completed':'unlocked'));
     const att=progress.attempts[i]||0;
     tile.innerHTML = locked ? '🔒' : (i+(completed?' ✓':'')+'<div class="att">'+(att?('x'+att):'')+'</div>');
-    if(!locked) tile.addEventListener('click', ()=>startLevel(i));
+    if(!locked) tile.addEventListener('click', ()=>{ if(fadeBusy) return; fadeToBlack(()=>startLevel(i)); });
     grid.appendChild(tile);
   }
+  const ind=document.getElementById('levelPageInd');
+  if(ind) ind.textContent = 'Trang '+levelPage+'/'+LEVEL_PAGES;
+  const prevBtn=document.getElementById('levelPrevBtn');
+  const nextBtn=document.getElementById('levelNextBtn');
+  if(prevBtn) prevBtn.disabled = levelPage<=1;
+  if(nextBtn) nextBtn.disabled = levelPage>=LEVEL_PAGES;
 }
+function levelPrevPage(){ if(levelPage>1){ levelPage--; renderLevelGrid(); } }
+function levelNextPage(){ if(levelPage<LEVEL_PAGES){ levelPage++; renderLevelGrid(); } }
 function milestonePreview(special){
   const map={fire:'radial-gradient(circle,#ffcf5c,#ff5a1f)',ice:'radial-gradient(circle,#e6ffff,#8fe9ff)',
     gold:'radial-gradient(circle,#fff3b0,#ffd700)',void:'radial-gradient(circle,#b18cff,#3a1f66)',
@@ -2218,25 +2603,90 @@ function milestonePreview(special){
     divine:'radial-gradient(circle,#ffffff,#fff6d6)'};
   return map[special]||'#fff';
 }
+const SKINS_PER_PAGE = 10;
+const SKIN_PAGES = Math.ceil(SKINS.length/SKINS_PER_PAGE);
+let skinPage = 1;
+let skinPreviewTiles = [];
+const skinPreviewBigCanvas = document.getElementById('skinPreviewBigCanvas');
+const skinPreviewBigCtx = skinPreviewBigCanvas ? skinPreviewBigCanvas.getContext('2d') : null;
+function drawSkinPreview(ctx, skin, equipped, scale){
+  scale = scale || 1;
+  const t = Date.now()*0.002;
+  ctx.save();
+  ctx.scale(scale, scale);
+  ctx.clearRect(0,0,40,50);
+  const w=26,h=32,x=7,y=8;
+  const fill = getSkinFillStyle(skin, t);
+  const bob = Math.sin(t*1.4 + skin.id)*1.4;
+  ctx.save();
+  ctx.translate(0,bob);
+  if(progress.settings.glow){ ctx.shadowColor=fill; ctx.shadowBlur=9; }
+  ctx.fillStyle=fill;
+  ctx.fillRect(x,y,w,h);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(150,200,255,0.15)';
+  ctx.fillRect(x-3,y-3,w+6,h+6);
+  ctx.fillStyle='#0a0a14';
+  ctx.fillRect(x+4,y+8,4,4);
+  ctx.fillRect(x+w-8,y+8,4,4);
+  const wa=Math.sin(t*3)*2;
+  ctx.fillStyle='#a0c0dd';
+  ctx.fillRect(x+2,y+h,6,4+wa);
+  ctx.fillRect(x+w-8,y+h,6,4-wa);
+  if(equipped){
+    ctx.strokeStyle='rgba(255,215,0,0.7)';
+    ctx.lineWidth=1.5;
+    ctx.strokeRect(x-4,y-4,w+8,h+8);
+  }
+  ctx.restore();
+  ctx.restore();
+}
+function animateSkinPreviews(){
+  if(skinPreviewBigCtx) drawSkinPreview(skinPreviewBigCtx, getSkin(progress.equipped), true, 5);
+  for(const {ctx,skin,equipped} of skinPreviewTiles) drawSkinPreview(ctx, skin, equipped, 1);
+}
 function renderSkinGrid(){
   const grid=document.getElementById('skinGrid');
   grid.innerHTML='';
-  SKINS.forEach(skin=>{
+  skinPreviewTiles=[];
+  const equippedSkin = getSkin(progress.equipped);
+  const bigNameEl = document.getElementById('skinPreviewBigName');
+  if(bigNameEl) bigNameEl.textContent = equippedSkin.name;
+  if(skinPreviewBigCtx) drawSkinPreview(skinPreviewBigCtx, equippedSkin, true, 5);
+  const start=(skinPage-1)*SKINS_PER_PAGE;
+  const end=Math.min(SKINS.length, skinPage*SKINS_PER_PAGE);
+  SKINS.slice(start,end).forEach(skin=>{
     const owned = skin.type==='default' || progress.owned.includes(skin.id);
     const equipped = progress.equipped===skin.id;
     const tile=document.createElement('div');
     tile.className='skinTile'+(equipped?' equipped':'')+(!owned?' locked':'');
-    const swatchBg = skin.type==='milestone' ? milestonePreview(skin.special) : skin.color;
     let sub;
     if(equipped) sub='ĐANG MẶC';
     else if(owned) sub='ĐÃ MỞ';
     else if(skin.type==='gold') sub=skin.price+' 💰';
     else sub='Cấp '+((MILESTONE_SKINS.indexOf(skin)+1)*5);
-    tile.innerHTML = `<div class="swatch" style="background:${swatchBg}"></div><div class="skinName">${skin.name}</div><div class="skinSub">${sub}</div>`;
+    const canvas=document.createElement('canvas');
+    canvas.className='charPreview'; canvas.width=40; canvas.height=50;
+    tile.appendChild(canvas);
+    const nameDiv=document.createElement('div'); nameDiv.className='skinName'; nameDiv.textContent=skin.name;
+    tile.appendChild(nameDiv);
+    const subDiv=document.createElement('div'); subDiv.className='skinSub'; subDiv.textContent=sub;
+    tile.appendChild(subDiv);
     tile.addEventListener('click', ()=>onSkinClick(skin));
     grid.appendChild(tile);
+    const ctx=canvas.getContext('2d');
+    skinPreviewTiles.push({ctx, skin, equipped});
+    drawSkinPreview(ctx, skin, equipped, 1);
   });
+  const ind=document.getElementById('skinPageInd');
+  if(ind) ind.textContent = 'Trang '+skinPage+'/'+SKIN_PAGES;
+  const prevBtn=document.getElementById('skinPrevBtn');
+  const nextBtn=document.getElementById('skinNextBtn');
+  if(prevBtn) prevBtn.disabled = skinPage<=1;
+  if(nextBtn) nextBtn.disabled = skinPage>=SKIN_PAGES;
 }
+function skinPrevPage(){ if(skinPage>1){ skinPage--; renderSkinGrid(); } }
+function skinNextPage(){ if(skinPage<SKIN_PAGES){ skinPage++; renderSkinGrid(); } }
 function onSkinClick(skin){
   ensureAudio();
   const owned = skin.type==='default' || progress.owned.includes(skin.id);
@@ -2258,6 +2708,7 @@ function onSkinClick(skin){
 }
 
 /* ============== DAILY REWARD ============== */
+const DAILY_REWARDS = [50,75,100,150,200,250,300];
 function renderDaily() {
   const grid = document.getElementById('dailyGrid');
   grid.innerHTML = '';
@@ -2268,10 +2719,10 @@ function renderDaily() {
   let streak = progress.daily.streak;
   if(!last || new Date(today) - new Date(last) > 86400000) streak = 0;
   
-  for(let i=1; i<=3; i++) {
+  for(let i=1; i<=DAILY_REWARDS.length; i++) {
     const box = document.createElement('div');
     box.className = 'daily-box';
-    let reward = i===1 ? 50 : i===2 ? 70 : 100;
+    let reward = DAILY_REWARDS[i-1];
     
     if(claimedToday || streak > i) {
       box.classList.add('claimed');
@@ -2302,9 +2753,9 @@ document.getElementById('claimBtn').addEventListener('click', ()=>{
   if(!progress.daily.lastClaim || new Date(today) - new Date(progress.daily.lastClaim) > 86400000) streak = 0;
   
   streak++;
-  if(streak > 3) streak = 1;
+  if(streak > DAILY_REWARDS.length) streak = 1;
   
-  let reward = streak === 1 ? 50 : streak === 2 ? 70 : 100;
+  let reward = DAILY_REWARDS[streak-1];
   progress.gold += reward;
   progress.daily.lastClaim = today;
   progress.daily.streak = streak;
@@ -2337,19 +2788,35 @@ function renderStats() {
 }
 
 /* ============== SETTINGS ============== */
+function updateVolumeUI(){
+  const row = document.getElementById('volumeRow');
+  const slider = document.getElementById('volumeSlider');
+  if(row) row.classList.toggle('show', !!progress.settings.sound);
+  if(slider) slider.value = progress.settings.volume;
+}
 function applySettingsUI() {
   document.getElementById('toggleSound').classList.toggle('on', progress.settings.sound);
   document.getElementById('toggleShake').classList.toggle('on', progress.settings.shake);
   document.getElementById('toggleParticle').classList.toggle('on', progress.settings.particle);
   document.getElementById('toggleGlow').classList.toggle('on', progress.settings.glow);
   document.getElementById('toggleTrail').classList.toggle('on', progress.settings.trail);
+  updateVolumeUI();
 }
 function toggleSetting(elem, key) {
   progress.settings[key] = !progress.settings[key];
   elem.classList.toggle('on', progress.settings[key]);
   if(key === 'sound' && progress.settings.sound) ensureAudio();
+  if(key === 'sound') updateVolumeUI();
   saveProgress();
 }
+document.getElementById('volumeSlider').addEventListener('input', (e)=>{
+  progress.settings.volume = parseInt(e.target.value, 10);
+  updateVolumeUI();
+  saveProgress();
+});
+document.getElementById('volumeSlider').addEventListener('change', ()=>{
+  ensureAudio(); sndClick();
+});
 
 /* ============== TABS & MISC ============== */
 document.querySelectorAll('.tabBtn').forEach(btn=>{
@@ -2365,13 +2832,18 @@ document.querySelectorAll('.tabBtn').forEach(btn=>{
   });
 });
 document.getElementById('continueBtn').addEventListener('click', ()=>{
+  if(fadeBusy) return;
   let target = progress.unlocked;
   for(let i=1;i<=progress.unlocked;i++){ if(!progress.completed[i]){ target=i; break; } }
-  startLevel(Math.min(TOTAL_LEVELS, target));
+  fadeToBlack(()=>startLevel(Math.min(TOTAL_LEVELS, target)));
 });
+document.getElementById('levelPrevBtn').addEventListener('click', ()=>{ ensureAudio(); sndClick(); levelPrevPage(); });
+document.getElementById('levelNextBtn').addEventListener('click', ()=>{ ensureAudio(); sndClick(); levelNextPage(); });
+document.getElementById('skinPrevBtn').addEventListener('click', ()=>{ ensureAudio(); sndClick(); skinPrevPage(); });
+document.getElementById('skinNextBtn').addEventListener('click', ()=>{ ensureAudio(); sndClick(); skinNextPage(); });
 document.getElementById('resetBtn').addEventListener('click', async ()=>{
   if(!confirm('Xoá toàn bộ tiến trình, vàng, setting và thống kê?')) return;
-  progress = { unlocked:1, completed:{}, attempts:{}, gold:0, owned:[], equipped:0, settings:{sound:true,shake:true,particle:true,glow:true,trail:true}, stats:{totalPlays:0,totalDeaths:0,playTimeSec:0,hardestLevel:0,bestEndlessFlags:0}, daily:{lastClaim:null,streak:0} };
+  progress = { unlocked:1, completed:{}, attempts:{}, gold:0, owned:[], equipped:0, settings:{sound:true,shake:true,particle:true,glow:true,trail:true,volume:100}, stats:{totalPlays:0,totalDeaths:0,playTimeSec:0,hardestLevel:0,bestEndlessFlags:0}, daily:{lastClaim:null,streak:0} };
   await saveProgress();
   renderMenu();
 });
@@ -2391,6 +2863,16 @@ function flashToast(msg){
   renderHome();
   requestAnimationFrame(loop);
 })();
+</script>
+<script>
+/* ===== Đăng ký Service Worker để chơi offline ===== */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(function (reg) { console.log('SW registered:', reg.scope); })
+      .catch(function (err) { console.warn('SW register failed:', err); });
+  });
+}
 </script>
 </body>
 </html>
