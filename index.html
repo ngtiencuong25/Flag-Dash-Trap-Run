@@ -7,15 +7,6 @@
 <meta name="x5-orientation" content="landscape">
 <meta name="x5-fullscreen" content="true">
 <title>Tìm Cờ</title>
-<!-- ===== PWA (cài lên điện thoại + chơi offline) ===== -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0a12">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Tìm Cờ">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <style>
 :root {
   --bg: #0a0a12;
@@ -91,7 +82,7 @@ body{overflow:hidden;background:var(--bg);font-family:'Courier New',monospace;to
 .t-btn::after{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 0 rgba(255,255,255,.55);opacity:0;pointer-events:none;}
 .t-btn.pulse::after{animation:tBtnPulse .45s ease-out;}
 @keyframes tBtnPulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.55);opacity:1;}100%{box-shadow:0 0 0 16px rgba(255,255,255,0);opacity:0;}}
-@media(min-width:1024px){#touch-ui{display:none}}
+@media (hover:hover) and (pointer:fine){#touch-ui{display:none}}
 
 /* ================= FADE TO BLACK TRANSITION ================= */
 #fadeOverlay{
@@ -894,6 +885,11 @@ function bindTouchBtn(id, keyCode) {
 bindTouchBtn('btn-left', 'ArrowLeft');
 bindTouchBtn('btn-right', 'ArrowRight');
 bindTouchBtn('btn-jump', 'Space');
+
+// Đảm bảo nút điều khiển luôn hiện trên thiết bị cảm ứng (kể cả tablet/điện thoại màn rộng khi xoay ngang)
+if('ontouchstart' in window || navigator.maxTouchPoints > 0){
+  document.getElementById('touch-ui').style.setProperty('display','flex','important');
+}
 
 /* Constants */
 const G=0.59,JUMP=-12.6,SPD=0.63,MAXSPD=4.4,FRIC=0.85,COYOTE=6,JBUF=6;
@@ -2863,16 +2859,6 @@ function flashToast(msg){
   renderHome();
   requestAnimationFrame(loop);
 })();
-</script>
-<script>
-/* ===== Đăng ký Service Worker để chơi offline ===== */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(function (reg) { console.log('SW registered:', reg.scope); })
-      .catch(function (err) { console.warn('SW register failed:', err); });
-  });
-}
 </script>
 </body>
 </html>
